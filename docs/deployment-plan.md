@@ -3,324 +3,642 @@
 
 ## 1. Deployment Objective
 
-Deployment bertujuan untuk menjalankan prototipe
-LabInventory pada lingkungan AWS Academy Cloud
-Foundations Sandbox serta memverifikasi konektivitas
-antara layanan pemrosesan dan penyimpanan data.
+Deployment dilakukan untuk mengimplementasikan
+arsitektur serverless LabInventory pada AWS Academy
+Cloud Foundations Sandbox Lingkungan Hidup.
 
-Deployment dilakukan secara bertahap dengan
-mempertimbangkan keterbatasan izin akses, waktu,
-dan anggaran sandbox.
+Tujuan deployment meliputi:
+
+- Melakukan provisioning infrastruktur cloud.
+- Menjalankan logika aplikasi pada AWS Lambda.
+- Menyimpan data inventaris pada Amazon S3.
+- Mengintegrasikan Lambda dengan Amazon S3.
+- Menerapkan konfigurasi keamanan dasar.
+- Menyediakan antarmuka HTTPS terautentikasi.
+- Memverifikasi operasi CRUD.
+- Memverifikasi persistensi data.
+- Memastikan pencatatan log aplikasi tersedia.
 
 ## 2. Deployment Environment
 
-| Komponen | Rencana Konfigurasi |
+| Parameter | Actual Configuration |
 |---|---|
 | Cloud Provider | Amazon Web Services |
-| Environment | AWS Academy Cloud Foundations Sandbox |
-| Region | Menyesuaikan region yang diizinkan |
-| Runtime | Python 3.11 atau versi kompatibel |
+| Environment | AWS Academy Cloud Foundations Sandbox Lingkungan Hidup |
+| Region | US East (N. Virginia) |
+| Region Code | us-east-1 |
+| Architecture | Serverless |
 | Compute | AWS Lambda |
 | Storage | Amazon S3 |
 | Access Control | AWS IAM |
+| HTTP Interface | Lambda Function URL |
 | Monitoring | Amazon CloudWatch |
-| Architecture | Serverless |
+| Deployment Method | ZIP Package |
+| Programming Language | Python 3.11 |
 
-Seluruh konfigurasi merupakan rancangan awal dan
-akan disesuaikan dengan kondisi sandbox.
+## 3. Deployment Prerequisites
 
-## 3. Prerequisites
+Persyaratan sebelum deployment:
 
-- Repository Git telah tersedia.
-- Source code aplikasi telah dikembangkan.
-- Python dan virtual environment tersedia.
-- Dependensi aplikasi telah terpasang.
+- Akses AWS Academy Cloud Foundations Sandbox.
+- Sesi sandbox aktif.
+- Akses AWS Management Console.
+- Source code aplikasi tersedia.
 - Pengujian lokal telah berhasil.
-- Akses AWS Academy Sandbox tersedia.
-- Layanan dan izin AWS telah diperiksa sebelum
-  provisioning dilakukan.
+- Deployment package tersedia.
+- Execution role yang diizinkan oleh sandbox.
+- Region AWS yang sesuai.
+- Ketersediaan layanan Lambda dan Amazon S3.
 
-## 4. Resource Configuration Plan
+Seluruh 35 pengujian otomatis lokal telah berhasil
+sebelum deployment dilakukan.
+
+## 4. AWS Resource Configuration
 
 ### 4.1 Amazon S3
 
-| Parameter | Rencana Konfigurasi |
+| Parameter | Actual Configuration |
 |---|---|
-| Bucket Name | labinventory-534903-[unique-suffix] |
-| Region | Sama dengan Lambda |
-| Public Access | Block All Public Access |
-| Encryption | SSE-S3 |
-| Versioning | Disabled untuk prototipe |
+| Bucket Name | labinventory-534903-20261125 |
+| Region | us-east-1 |
 | Object Key | inventory.json |
-| Content Type | application/json |
+| Data Format | JSON |
+| Block All Public Access | On |
+| Default Encryption | SSE-S3 |
 
-Bucket digunakan untuk menyimpan data inventaris
-dalam format JSON.
-
-Objek inventory.json akan diinisialisasi dengan
-array kosong:
+Data awal inventory.json:
 
 ```json
 []
 ```
 
-Inisialisasi dilakukan sebelum pengujian Lambda
-untuk memastikan objek penyimpanan tersedia.
+Amazon S3 digunakan sebagai penyimpanan utama
+data inventaris.
+
+Bucket tidak dikonfigurasi untuk memberikan
+akses publik.
 
 ### 4.2 AWS Lambda
 
-| Parameter | Rencana Konfigurasi |
+| Parameter | Actual Configuration |
 |---|---|
 | Function Name | labinventory-crud |
-| Runtime | Python 3.11 atau versi kompatibel |
+| Runtime | Python 3.11 |
 | Architecture | x86_64 |
 | Memory | 128 MB |
 | Timeout | 15 seconds |
+| Ephemeral Storage | 512 MB |
 | Handler | src.lambda_function.lambda_handler |
-| Execution Role | LabRole atau role yang diizinkan |
-| VPC | Default, tanpa custom VPC |
+| Execution Role | LabRole |
+| Deployment Type | ZIP Package |
 
-Environment variables:
+Lambda menjalankan logika bisnis, validasi data,
+routing request, dan operasi CRUD.
 
-| Key | Value |
+### 4.3 Environment Variables
+
+| Variable | Value |
 |---|---|
-| BUCKET_NAME | Nama bucket S3 aktual |
+| BUCKET_NAME | labinventory-534903-20261125 |
 | OBJECT_KEY | inventory.json |
 
-Konfigurasi memory dan timeout dapat disesuaikan
-berdasarkan hasil pengujian.
+Environment variables digunakan agar konfigurasi
+penyimpanan tidak ditanamkan langsung pada source code.
 
-### 4.3 AWS IAM
+### 4.4 AWS IAM
 
-Lambda menggunakan execution role yang tersedia
-dan diizinkan pada lingkungan sandbox.
+Execution role yang digunakan:
 
-Izin yang dibutuhkan aplikasi meliputi:
+LabRole
 
-- s3:GetObject
-- s3:PutObject
-- logs:CreateLogGroup
-- logs:CreateLogStream
-- logs:PutLogEvents
+Role tersebut disediakan oleh lingkungan
+AWS Academy Sandbox.
 
-Izin s3:ListBucket dapat diperlukan untuk mendukung
-pemeriksaan keberadaan objek atau bucket.
+Izin yang diperlukan oleh aplikasi meliputi:
 
-Pembuatan maupun perubahan IAM role hanya dilakukan
-apabila diizinkan oleh sandbox.
+- Membaca objek Amazon S3.
+- Menulis objek Amazon S3.
+- Membuat dan mengirimkan log CloudWatch.
 
-### 4.4 Amazon CloudWatch
+Implementasi menggunakan role yang tersedia pada
+sandbox dan belum menerapkan custom least-privilege
+IAM policy secara penuh.
 
-CloudWatch digunakan untuk memeriksa log eksekusi
-Lambda dan membantu proses troubleshooting.
+### 4.5 Lambda Function URL
 
-Log group yang diharapkan:
+| Parameter | Actual Configuration |
+|---|---|
+| Interface | Lambda Function URL |
+| Authentication | AWS_IAM |
+| Invoke Mode | BUFFERED |
+| Protocol | HTTPS |
+| CORS | Not enabled |
+
+Function URL menyediakan antarmuka HTTPS untuk
+mengakses Lambda menggunakan autentikasi AWS IAM.
+
+Alamat Function URL tidak dicantumkan pada
+repository publik.
+
+### 4.6 Amazon CloudWatch
+
+Log group:
 
 /aws/lambda/labinventory-crud
 
-Ketersediaan log bergantung pada izin execution role.
+CloudWatch digunakan untuk mencatat:
+
+- Informasi request aplikasi.
+- Informasi eksekusi Lambda.
+- START, END, dan REPORT.
+- Durasi eksekusi.
+- Penggunaan memori.
+- Informasi kesalahan aplikasi apabila terjadi error.
 
 ## 5. Deployment Package
 
-Deployment package disiapkan dalam format ZIP.
-
-Struktur minimum:
+Source code yang digunakan:
 
 ```text
-labinventory-deployment.zip
-└── src/
-    ├── __init__.py
-    ├── inventory.py
-    ├── storage.py
-    ├── s3_storage.py
-    └── lambda_function.py
+src/
+├── __init__.py
+├── inventory.py
+├── lambda_function.py
+├── s3_storage.py
+└── storage.py
 ```
 
-Folder src harus berada pada root deployment package
-agar sesuai dengan konfigurasi Lambda handler.
+Deployment package dibuat menggunakan
+Windows PowerShell dari root repository:
 
-AWS Lambda Python runtime menyediakan boto3.
-Untuk prototipe ini, SDK bawaan runtime dapat
-digunakan setelah kompatibilitasnya diverifikasi.
+```powershell
+Compress-Archive -Path .\src -DestinationPath .\labinventory-deployment.zip -Force
+```
 
-File berikut tidak dimasukkan ke deployment package:
+Nama deployment package:
 
-- Virtual environment
-- Folder .git
-- Folder tests
-- Folder docs
-- Folder evidence
-- File kredensial AWS
-- Data penyimpanan lokal
+labinventory-deployment.zip
+
+Folder src harus berada pada root arsip ZIP
+agar sesuai dengan konfigurasi handler.
+
+Handler:
+
+src.lambda_function.lambda_handler
+
+Deployment package tidak dimasukkan ke dalam
+repository publik.
 
 ## 6. Deployment Procedure
 
-### Phase 1 - Sandbox Verification
+### Phase 1 — Sandbox Environment Preparation
+
+Tahapan:
 
 1. Membuka AWS Academy Cloud Foundations.
-2. Membuka lingkungan sandbox.
-3. Memulai sesi lab.
+2. Membuka Sandbox Lingkungan Hidup.
+3. Menjalankan sesi sandbox.
 4. Membuka AWS Management Console.
-5. Memeriksa region yang tersedia.
-6. Memeriksa akses terhadap S3, Lambda, IAM,
-   dan CloudWatch.
-7. Memeriksa execution role yang tersedia.
-8. Menentukan kelayakan arsitektur awal.
+5. Memastikan region us-east-1 digunakan.
 
-Apabila layanan utama tidak tersedia, arsitektur
-akan disesuaikan sebelum provisioning dilanjutkan.
+Result: COMPLETED.
 
-### Phase 2 - Storage Provisioning
+Evidence:
+
+- 03_sandbox_environment.png
+- 04_aws_console_region.png
+
+### Phase 2 — Storage Provisioning
+
+Tahapan:
 
 1. Membuka layanan Amazon S3.
-2. Membuat bucket dengan nama unik.
-3. Memilih region yang sesuai.
-4. Memastikan Block Public Access aktif.
-5. Memastikan enkripsi penyimpanan aktif.
-6. Membuat atau mengunggah inventory.json.
-7. Memastikan isi awal objek berupa array kosong.
-8. Mendokumentasikan konfigurasi bucket.
+2. Membuat bucket labinventory-534903-20261125.
+3. Memastikan Block All Public Access aktif.
+4. Memastikan default encryption menggunakan SSE-S3.
+5. Membuat file inventory.json.
+6. Menginisialisasi file dengan array kosong.
+7. Mengunggah file ke bucket.
 
-### Phase 3 - Compute Provisioning
+Result: COMPLETED.
+
+Evidence:
+
+- 05_s3_bucket_created.png
+- 06_s3_initial_data_uploaded.png
+- aws_s3_block_public_access.png
+- aws_s3_default_encryption.png
+
+### Phase 3 — Compute Provisioning
+
+Tahapan:
 
 1. Membuka layanan AWS Lambda.
 2. Membuat function labinventory-crud.
-3. Memilih runtime Python yang kompatibel.
-4. Memilih execution role yang diizinkan.
-5. Mengunggah deployment package.
-6. Mengatur konfigurasi handler.
-7. Mengatur environment variables.
-8. Mengatur memory dan timeout.
-9. Menyimpan konfigurasi function.
+3. Menggunakan runtime Python 3.11.
+4. Menggunakan architecture x86_64.
+5. Menggunakan execution role LabRole.
+6. Mengunggah deployment package.
+7. Mengatur Lambda handler.
+8. Mengatur memory menjadi 128 MB.
+9. Mengatur timeout menjadi 15 seconds.
+10. Mengatur environment variables.
+11. Menyimpan konfigurasi.
 
-### Phase 4 - Connectivity Verification
+Result: COMPLETED.
 
-1. Membuat Lambda test event untuk GET /barang.
-2. Menjalankan function.
-3. Memeriksa status code.
-4. Memeriksa response JSON.
-5. Memastikan Lambda dapat membaca objek S3.
-6. Memeriksa CloudWatch Logs jika tersedia.
-7. Melakukan troubleshooting apabila terdapat error.
+Evidence:
 
-### Phase 5 - CRUD Verification
+- 07_lambda_function_created.png
+- 08_lambda_code_deployed.png
+- aws_lambda_runtime_settings.png
+- aws_lambda_environment_variables.png
+- aws_lambda_general_configuration.png
 
-1. Menambahkan data barang melalui POST /barang.
-2. Menampilkan data melalui GET /barang.
-3. Memperbarui barang melalui PUT /barang/{id_barang}.
-4. Menghapus barang melalui DELETE /barang/{id_barang}.
-5. Memeriksa perubahan objek inventory.json.
-6. Mendokumentasikan hasil setiap pengujian.
+### Phase 4 — IAM and Service Connectivity
 
-### Phase 6 - HTTP Access (Conditional)
+Tahapan:
 
-Apabila layanan dan izin sandbox memungkinkan,
-antarmuka HTTP dapat dikonfigurasi menggunakan
-API Gateway atau Lambda Function URL.
+1. Memeriksa execution role Lambda.
+2. Memeriksa izin akses Amazon S3.
+3. Memeriksa izin pencatatan CloudWatch.
+4. Menjalankan Lambda Test Event.
 
-Antarmuka HTTP harus menggunakan mekanisme akses
-yang sesuai dan tidak dibuka secara publik tanpa
-pengamanan.
+Initial test event:
 
-Apabila konfigurasi HTTP tidak memungkinkan,
-pengujian dilakukan melalui Lambda Console dengan
-event yang merepresentasikan request HTTP.
+```json
+{
+    "httpMethod": "GET",
+    "path": "/barang"
+}
+```
 
-Keterbatasan tersebut akan dicatat dalam laporan.
+Actual result:
 
-### Phase 7 - Final Verification
+- Status code: 200.
+- Total: 0.
+- Data: [].
 
-1. Memastikan konfigurasi resource sesuai rancangan.
-2. Memastikan operasi CRUD telah diuji.
-3. Memeriksa penyimpanan data pada S3.
-4. Memeriksa log aplikasi.
-5. Mengumpulkan screenshot dan hasil pengujian.
-6. Memperbarui diagram arsitektur.
-7. Memperbarui dokumentasi repository.
+Result: PASSED.
 
-## 7. Cost Management
+Evidence:
 
-Penggunaan resource dibatasi pada kebutuhan
-provisioning dan pengujian prototipe.
+- aws_lambda_s3_permissions.png
+- aws_lambda_cloudwatch_permissions.png
+- aws_test_get_initial_inventory.png
 
-Strategi pengendalian penggunaan:
+### Phase 5 — Functional Testing
 
-- Menggunakan Lambda dengan konfigurasi minimal.
-- Menyimpan data JSON berukuran kecil.
-- Membatasi jumlah invocation pengujian.
-- Tidak membuat resource yang tidak diperlukan.
-- Menghindari NAT Gateway dan infrastruktur tambahan
-  yang tidak dibutuhkan.
-- Memantau sisa anggaran sandbox jika tersedia.
-- Menghentikan sesi lab sesuai petunjuk AWS Academy.
+Pengujian dilakukan menggunakan Lambda Test Event.
 
-## 8. Troubleshooting Plan
+| Test Scenario | Expected | Actual | Result |
+|---|---:|---:|---|
+| Initial connectivity | 200 | 200 | PASS |
+| Create barang | 201 | 201 | PASS |
+| Read barang | 200 | 200 | PASS |
+| Update barang | 200 | 200 | PASS |
+| Verify updated data | 200 | 200 | PASS |
+| Delete barang | 200 | 200 | PASS |
+| Read after delete | 200 | 200 | PASS |
+| Invalid quantity | 400 | 400 | PASS |
+| Delete barang not found | 404 | 404 | PASS |
 
-| Error | Pemeriksaan |
+Total functional tests: 9.
+
+Passed: 9.
+
+Failed: 0.
+
+Result: PASSED.
+
+Status code 400 dan 404 merupakan hasil yang
+diharapkan pada skenario negative testing.
+
+Prosedur dan hasil pengujian lengkap tersedia
+pada docs/testing-plan.md.
+
+### Phase 6 — Monitoring Verification
+
+Tahapan:
+
+1. Membuka layanan Amazon CloudWatch.
+2. Membuka log group Lambda.
+3. Memilih log stream.
+4. Memeriksa informasi request aplikasi.
+5. Memeriksa informasi eksekusi Lambda.
+
+Actual result:
+
+- Log group tersedia.
+- Log stream tersedia.
+- Informasi request aplikasi tersedia.
+- Informasi START, END, dan REPORT tersedia.
+
+Result: PASSED.
+
+Evidence:
+
+- aws_cloudwatch_log_group.png
+- aws_cloudwatch_log_events.png
+
+### Phase 7 — HTTP Interface Configuration
+
+Tahapan:
+
+1. Membuka konfigurasi Lambda function.
+2. Membuka bagian Function URL.
+3. Membuat Function URL.
+4. Menggunakan authentication type AWS_IAM.
+5. Menggunakan invoke mode BUFFERED.
+6. Menyimpan konfigurasi.
+
+Result: COMPLETED.
+
+Evidence:
+
+aws_lambda_function_url.png
+
+### Phase 8 — Authenticated HTTP Connectivity
+
+Pengujian dilakukan melalui AWS CloudShell
+menggunakan AWS session credentials dan
+AWS Signature Version 4.
+
+Request:
+
+- Method: GET.
+- Path: /barang.
+- Authentication: AWS_IAM.
+- Protocol: HTTPS.
+
+Pemeriksaan identitas AWS:
+
+```bash
+aws sts get-caller-identity
+```
+
+Contoh script untuk mereplikasi pengujian HTTPS:
+
+```python
+import boto3
+import urllib.request
+
+from botocore.auth import SigV4Auth
+from botocore.awsrequest import AWSRequest
+
+region = "us-east-1"
+
+function_url = "https://YOUR_FUNCTION_URL.lambda-url.us-east-1.on.aws/"
+url = function_url.rstrip("/") + "/barang"
+
+session = boto3.Session()
+credentials = session.get_credentials().get_frozen_credentials()
+
+request = AWSRequest(
+    method="GET",
+    url=url
+)
+
+SigV4Auth(
+    credentials,
+    "lambda",
+    region
+).add_auth(request)
+
+http_request = urllib.request.Request(
+    url=url,
+    headers=dict(request.headers),
+    method="GET"
+)
+
+with urllib.request.urlopen(http_request) as response:
+    print("HTTP Status:", response.status)
+    print(response.read().decode("utf-8"))
+```
+
+Placeholder YOUR_FUNCTION_URL harus diganti dengan
+alamat Function URL yang tersedia pada sandbox.
+
+Script tersebut menggunakan kredensial dari
+AWS session dan tidak menanamkan access key,
+secret key, maupun session token pada source code.
+
+Actual result:
+
+```text
+HTTP Status: 200
+```
+
+Response body:
+
+```json
+{
+    "message": "Data inventaris berhasil dibaca.",
+    "total": 0,
+    "data": []
+}
+```
+
+Result: PASSED.
+
+Evidence:
+
+aws_http_connectivity_test.png
+
+Pengujian HTTPS aktual dilakukan pada metode GET.
+
+Operasi POST, PUT, dan DELETE telah diuji melalui
+Lambda Test Event, bukan melalui request HTTP langsung.
+
+### Phase 9 — Final Storage Verification
+
+Tahapan:
+
+1. Membuka layanan Amazon S3.
+2. Membuka bucket LabInventory.
+3. Memilih objek inventory.json.
+4. Memeriksa isi akhir objek.
+5. Memastikan data sesuai dengan hasil pengujian.
+
+Actual result:
+
+```json
+[]
+```
+
+Objek inventory.json tetap tersedia dengan ukuran
+2 bytes setelah seluruh rangkaian pengujian.
+
+Result: PASSED.
+
+Evidence:
+
+aws_s3_final_inventory.png
+
+## 7. Security and Network Configuration
+
+Konfigurasi keamanan dasar meliputi:
+
+- S3 Block All Public Access aktif.
+- Default encryption menggunakan SSE-S3.
+- Lambda menggunakan execution role LabRole.
+- Function URL menggunakan AWS_IAM.
+- Komunikasi client menggunakan HTTPS.
+- Kredensial AWS tidak ditanamkan pada source code.
+- Screenshot mentah dikecualikan dari Git.
+- Informasi autentikasi tidak dipublikasikan.
+
+Arsitektur tidak merancang custom VPC, subnet,
+atau EC2 instance.
+
+Komunikasi antar layanan menggunakan fasilitas
+layanan AWS terkelola dan izin IAM.
+
+## 8. Cost Management
+
+Implementasi menggunakan pendekatan serverless
+untuk menjaga kesederhanaan provisioning dan
+menghindari kebutuhan server virtual yang
+berjalan secara terus-menerus.
+
+Pengendalian penggunaan resource meliputi:
+
+- Menggunakan Lambda dengan memory 128 MB.
+- Menggunakan timeout 15 seconds.
+- Menggunakan satu objek JSON pada Amazon S3.
+- Menggunakan data contoh berukuran kecil.
+- Menjalankan pengujian sesuai kebutuhan.
+- Tidak membuat resource tambahan yang tidak diperlukan.
+- Memantau penggunaan kredit sandbox.
+- Mengakhiri sesi sandbox sesuai ketentuan lab
+  setelah kegiatan selesai.
+
+Biaya aktual bergantung pada penggunaan resource
+dan ketentuan AWS Academy Sandbox.
+
+Implementasi tidak mengklaim biaya penggunaan nol.
+
+## 9. Troubleshooting
+
+| Issue | Possible Cause | Recommended Action |
+|---|---|---|
+| AccessDenied | Izin IAM tidak sesuai | Memeriksa execution role |
+| NoSuchBucket | Nama bucket tidak sesuai | Memeriksa BUCKET_NAME |
+| NoSuchKey | Objek tidak tersedia | Memeriksa OBJECT_KEY |
+| ImportModuleError | Struktur ZIP atau handler salah | Memeriksa deployment package |
+| Lambda timeout | Eksekusi melebihi batas waktu | Memeriksa timeout dan CloudWatch |
+| Invalid JSON | Format request tidak valid | Memeriksa request body |
+| HTTP 403 | Autentikasi atau izin IAM tidak sesuai | Memeriksa AWS credentials dan SigV4 |
+| HTTP 404 | Barang atau endpoint tidak tersedia | Memeriksa ID dan path |
+| HTTP 500 | Internal server atau storage error | Memeriksa CloudWatch Logs |
+
+Tabel tersebut merupakan panduan troubleshooting,
+bukan daftar error yang seluruhnya terjadi selama
+deployment aktual.
+
+## 10. Rollback and Recovery Plan
+
+Apabila deployment mengalami kegagalan:
+
+1. Memeriksa pesan kesalahan pada CloudWatch.
+2. Memeriksa konfigurasi Lambda.
+3. Memeriksa environment variables.
+4. Memeriksa execution role.
+5. Menggunakan source code dari commit yang stabil.
+6. Membuat ulang deployment package.
+7. Mengunggah package yang telah diperbaiki.
+8. Menjalankan pengujian konektivitas.
+9. Menjalankan kembali pengujian CRUD.
+
+Apabila data inventaris perlu dipulihkan,
+gunakan salinan data yang valid apabila tersedia.
+
+Inisialisasi ulang dengan array kosong hanya
+dilakukan pada lingkungan pengujian apabila
+penghapusan data memang diizinkan.
+
+Prosedur rollback merupakan rencana pemulihan
+dan belum diuji sebagai skenario terpisah.
+
+## 11. Resource Cleanup Plan
+
+Setelah seluruh kegiatan pengujian dan dokumentasi
+selesai, resource dapat dievaluasi sesuai ketentuan
+AWS Academy Sandbox.
+
+Tahapan cleanup apabila penghapusan diizinkan:
+
+1. Memastikan seluruh bukti telah dikumpulkan.
+2. Menyimpan dokumentasi dan source code.
+3. Menghapus Function URL apabila tidak diperlukan.
+4. Menghapus Lambda function apabila diizinkan.
+5. Menghapus objek dan bucket S3 apabila diizinkan.
+6. Menghapus CloudWatch log group apabila diperlukan.
+7. Mengakhiri sesi sandbox sesuai ketentuan lab.
+
+Resource tidak boleh dihapus apabila masih
+diperlukan untuk penilaian atau demonstrasi.
+
+Cleanup merupakan rencana dan tidak dinyatakan
+telah dilakukan.
+
+## 12. Deployment Acceptance Criteria
+
+| Acceptance Criteria | Result |
 |---|---|
-| AccessDenied | Execution role dan izin layanan |
-| NoSuchBucket | Nama bucket dan region |
-| NoSuchKey | Keberadaan inventory.json |
-| ImportModuleError | Struktur ZIP dan handler |
-| ModuleNotFoundError | Dependensi dan runtime |
-| Timeout | Timeout function dan konektivitas |
-| Status 400 | Format request dan validasi data |
-| Status 404 | Endpoint atau ID barang |
-| Status 500 | Konfigurasi, penyimpanan, dan log |
+| AWS Sandbox dapat digunakan | PASS |
+| Amazon S3 bucket tersedia | PASS |
+| Objek inventory.json tersedia | PASS |
+| Lambda function tersedia | PASS |
+| Source code berhasil di-deploy | PASS |
+| Runtime dan handler sesuai | PASS |
+| Environment variables sesuai | PASS |
+| IAM execution role tersedia | PASS |
+| Lambda dapat mengakses Amazon S3 | PASS |
+| Operasi CRUD berhasil | PASS |
+| Negative testing berhasil | PASS |
+| Persistensi data terverifikasi | PASS |
+| CloudWatch Logs tersedia | PASS |
+| Lambda Function URL tersedia | PASS |
+| Konektivitas HTTPS terautentikasi berhasil | PASS |
+| Konfigurasi keamanan dasar S3 terverifikasi | PASS |
+| Bukti deployment tersedia | PASS |
 
-Setiap kendala akan diperiksa berdasarkan pesan
-error aktual sebelum perubahan konfigurasi dilakukan.
+Seluruh acceptance criteria teknis utama
+deployment prototipe telah terpenuhi.
 
-## 9. Rollback and Adaptation
+## 13. Deployment Status
 
-Apabila deployment gagal karena keterbatasan
-sandbox, langkah berikut dapat dilakukan:
+| Component | Status |
+|---|---|
+| Local Implementation | COMPLETED |
+| Local Automated Testing | PASSED - 35/35 |
+| AWS Environment Preparation | COMPLETED |
+| S3 Provisioning | COMPLETED |
+| Lambda Provisioning | COMPLETED |
+| Source Code Deployment | COMPLETED |
+| IAM Configuration | VERIFIED |
+| AWS Functional Testing | PASSED - 9/9 |
+| HTTP Interface Configuration | COMPLETED |
+| HTTP Connectivity | PASSED - HTTP 200 |
+| CloudWatch Monitoring | VERIFIED |
+| S3 Persistence Verification | PASSED |
+| Basic S3 Security | VERIFIED |
+| Resource Cleanup | NOT CONFIRMED |
 
-1. Mengidentifikasi penyebab kegagalan.
-2. Memeriksa alternatif konfigurasi yang diizinkan.
-3. Menyesuaikan arsitektur jika diperlukan.
-4. Membuat branch Git terpisah untuk perubahan besar.
-5. Mempertahankan versi implementasi lokal sebelumnya.
-6. Menjalankan ulang pengujian setelah perubahan.
-7. Memperbarui dokumentasi sesuai implementasi aktual.
+**Overall Deployment Status: COMPLETED**
 
-## 10. Resource Cleanup
+LabInventory telah berhasil di-deploy pada
+AWS Academy Cloud Foundations Sandbox Lingkungan Hidup.
 
-Setelah pengujian dan pengumpulan bukti selesai:
+AWS Lambda berhasil menjalankan logika aplikasi
+dan terintegrasi dengan Amazon S3 untuk melakukan
+operasi CRUD.
 
-1. Memastikan seluruh screenshot telah tersimpan.
-2. Memastikan hasil pengujian telah terdokumentasi.
-3. Memastikan perubahan kode telah tersimpan di Git.
-4. Memeriksa resource yang masih aktif.
-5. Menghapus resource yang tidak lagi diperlukan
-   apabila diizinkan dan tidak dibutuhkan untuk
-   penilaian.
-6. Mengakhiri sesi lab sesuai petunjuk AWS Academy.
+Konektivitas HTTPS terautentikasi telah diverifikasi
+melalui Lambda Function URL, sedangkan Amazon
+CloudWatch berhasil mencatat informasi eksekusi.
 
-Mengakhiri sesi lab tidak diasumsikan otomatis
-menghapus seluruh resource.
-
-## 11. Deployment Success Criteria
-
-Deployment dinyatakan berhasil apabila:
-
-- Resource utama berhasil dikonfigurasi.
-- Lambda dapat menjalankan source code aplikasi.
-- Lambda dapat membaca dan menulis data pada S3.
-- Empat operasi CRUD berhasil diuji.
-- Perubahan data dapat diverifikasi.
-- Bukti konfigurasi dan pengujian tersedia.
-- Dokumentasi sesuai dengan implementasi aktual.
-
-Ketersediaan endpoint HTTP aktual dicatat secara
-terpisah dari keberhasilan pengujian Lambda.
-
-## 12. Deployment Status
-
-Status: Planned - Not Yet Deployed
-
-Implementasi dan pengujian lokal telah selesai.
-Provisioning AWS belum dilaksanakan.
-
-Dokumen ini akan diperbarui setelah pelaksanaan
-deployment pada AWS Academy Sandbox.
+Implementasi dan pengujian telah memenuhi target
+teknis prototipe akademik dengan batasan yang
+didokumentasikan.

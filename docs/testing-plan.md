@@ -8,8 +8,12 @@ LabInventory dapat menjalankan operasi CRUD,
 memvalidasi data masukan, menangani kesalahan,
 dan mengakses layanan penyimpanan cloud.
 
-Pengujian dilakukan pada lingkungan lokal dan
-AWS Academy Cloud Foundations Sandbox.
+Pengujian juga bertujuan untuk memverifikasi
+konektivitas HTTPS, konfigurasi keamanan dasar,
+persistensi data, dan pencatatan log aplikasi.
+
+Pengujian dilaksanakan pada lingkungan lokal dan
+AWS Academy Cloud Foundations Sandbox Lingkungan Hidup.
 
 ## 2. Testing Scope
 
@@ -25,7 +29,10 @@ Ruang lingkup pengujian meliputi:
 - Operasi CRUD pada lingkungan AWS.
 - Persistensi data.
 - Penanganan kesalahan.
-- Pencatatan log aplikasi.
+- Konektivitas HTTPS melalui Lambda Function URL.
+- Konfigurasi keamanan dasar Amazon S3.
+- Konfigurasi IAM execution role.
+- Pencatatan log aplikasi melalui CloudWatch.
 
 Pengujian performa skala besar, concurrent write,
 antarmuka pengguna, dan autentikasi pengguna aplikasi
@@ -39,27 +46,35 @@ tidak termasuk dalam ruang lingkup prototipe.
 |---|---|
 | Operating System | Windows |
 | Development Tool | Visual Studio Code |
-| Programming Language | Python 3.11 |
+| Programming Language | Python 3.11.8 |
 | Testing Framework | unittest |
 | AWS SDK | boto3 |
 | Local Storage | JSON File |
 | AWS Simulation | Mock dan Botocore Stubber |
 | Version Control | Git dan GitHub |
+| Virtual Environment | .venv |
 
 ### 3.2 Cloud Environment
 
-| Komponen | Rencana Konfigurasi |
+| Komponen | Konfigurasi Aktual |
 |---|---|
-| Environment | AWS Academy Cloud Foundations Sandbox |
+| Environment | AWS Academy Cloud Foundations Sandbox Lingkungan Hidup |
+| Region | US East (N. Virginia) |
+| Region Code | us-east-1 |
 | Compute | AWS Lambda |
+| Function Name | labinventory-crud |
+| Runtime | Python 3.11 |
+| Memory | 128 MB |
+| Timeout | 15 seconds |
 | Storage | Amazon S3 |
+| Bucket Name | labinventory-534903-20261125 |
+| Object Key | inventory.json |
 | Access Control | AWS IAM |
+| Execution Role | LabRole |
+| HTTP Interface | Lambda Function URL |
+| HTTP Authentication | AWS_IAM |
 | Monitoring | Amazon CloudWatch |
-| Testing Interface | Lambda Console atau HTTP interface |
-| Region | Menyesuaikan sandbox |
-
-Konfigurasi cloud akan diperbarui berdasarkan
-lingkungan deployment aktual.
+| Testing Interface | Lambda Console dan AWS CloudShell |
 
 ## 4. Local Automated Testing
 
@@ -92,6 +107,13 @@ Perintah pengujian:
 python -m unittest tests.test_inventory -v
 ```
 
+Hasil pengujian:
+
+- Total tests: 20.
+- Passed: 20.
+- Failed: 0.
+- Status: PASS.
+
 ### 4.2 AWS Integration Simulation
 
 File pengujian:
@@ -112,15 +134,26 @@ Pengujian mencakup:
 - Pemrosesan event HTTP versi 2.
 - Penanganan kesalahan penyimpanan.
 
+Pengujian menggunakan Mock dan Botocore Stubber
+untuk mensimulasikan interaksi dengan layanan AWS
+tanpa menggunakan resource cloud aktual.
+
 Perintah pengujian:
 
 ```bash
 python -m unittest tests.test_aws_integration -v
 ```
 
+Hasil pengujian:
+
+- Total tests: 15.
+- Passed: 15.
+- Failed: 0.
+- Status: PASS.
+
 ### 4.3 Combined Testing
 
-Seluruh pengujian dijalankan menggunakan:
+Seluruh pengujian otomatis dijalankan menggunakan:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -128,66 +161,83 @@ python -m unittest discover -s tests -v
 
 ### 4.4 Local Testing Results
 
-| Test Suite | Total | Passed | Failed |
-|---|---:|---:|---:|
-| Inventory Unit Testing | 20 | 20 | 0 |
-| AWS Integration Simulation | 15 | 15 | 0 |
-| Total | 35 | 35 | 0 |
+| Test Suite | Total | Passed | Failed | Result |
+|---|---:|---:|---:|---|
+| Inventory Unit Testing | 20 | 20 | 0 | PASS |
+| AWS Integration Simulation | 15 | 15 | 0 | PASS |
+| Total | 35 | 35 | 0 | PASS |
 
-Status: PASSED
+Success rate: 100%.
 
-Hasil tersebut merupakan pengujian lokal.
-Simulasi integrasi AWS tidak membuktikan bahwa
-infrastruktur AWS aktual telah berhasil dikonfigurasi.
+Seluruh pengujian otomatis lokal berhasil dijalankan.
+
+Simulasi integrasi AWS merupakan pengujian terhadap
+perilaku aplikasi dan adapter penyimpanan secara lokal,
+bukan pengujian terhadap infrastruktur AWS aktual.
+
+Pengujian cloud dilakukan secara terpisah setelah
+provisioning selesai.
 
 ## 5. Cloud Testing Prerequisites
 
-Sebelum pengujian cloud dilakukan, pastikan:
+Sebelum pengujian cloud dilakukan, konfigurasi berikut
+telah disiapkan:
 
-- Sesi AWS Sandbox aktif.
-- Bucket S3 telah tersedia.
-- Bucket tidak dapat diakses secara publik.
+- Sesi AWS Academy Sandbox aktif.
+- Bucket Amazon S3 tersedia.
+- S3 Block Public Access aktif.
 - Objek inventory.json telah diinisialisasi.
 - Lambda function telah dibuat.
 - Deployment package telah diunggah.
-- Handler telah dikonfigurasi.
+- Lambda handler telah dikonfigurasi.
 - Environment variables telah dikonfigurasi.
-- Execution role memiliki izin yang diperlukan.
+- Execution role LabRole telah digunakan.
 
-Pengujian awal menggunakan inventory.json
-dengan isi berupa array kosong.
+Pengujian awal menggunakan inventory.json dengan
+isi berupa array JSON kosong:
 
-## 6. Cloud Test Cases
+```json
+[]
+```
 
-| ID | Test Scenario | Expected Result | Status |
-|---|---|---|---|
-| CT-01 | Lambda membaca objek S3 | Status 200 | Pending |
-| CT-02 | Menambahkan barang | Status 201 | Pending |
-| CT-03 | Menampilkan daftar barang | Status 200 | Pending |
-| CT-04 | Memperbarui barang | Status 200 | Pending |
-| CT-05 | Memeriksa persistensi data pada S3 | Data sesuai | Pending |
-| CT-06 | Menghapus barang | Status 200 | Pending |
-| CT-07 | Membaca inventaris setelah penghapusan | Barang tidak ditemukan dalam daftar | Pending |
-| CT-08 | Menambahkan barang dengan jumlah negatif | Status 400 | Pending |
-| CT-09 | Memperbarui ID yang tidak ditemukan | Status 404 | Pending |
-| CT-10 | Mengakses endpoint tidak valid | Status 404 | Pending |
-| CT-11 | Memeriksa CloudWatch Logs | Log eksekusi tersedia | Pending |
-| CT-12 | Mengakses endpoint HTTP aktual | Response sesuai | Conditional |
+Data yang digunakan merupakan data contoh untuk
+kebutuhan pengujian, bukan data inventaris
+laboratorium aktual.
 
-Status Conditional menunjukkan pengujian yang
-bergantung pada ketersediaan antarmuka HTTP.
+## 6. Cloud Functional Test Cases
 
-## 7. Cloud Testing Procedure
+| ID | Test Scenario | Expected Status | Actual Status | Result |
+|---|---|---:|---:|---|
+| CT-01 | Initial inventory connectivity | 200 | 200 | PASS |
+| CT-02 | Create barang | 201 | 201 | PASS |
+| CT-03 | Read barang | 200 | 200 | PASS |
+| CT-04 | Update barang | 200 | 200 | PASS |
+| CT-05 | Verify updated data | 200 | 200 | PASS |
+| CT-06 | Delete barang | 200 | 200 | PASS |
+| CT-07 | Read after delete | 200 | 200 | PASS |
+| CT-08 | Invalid quantity | 400 | 400 | PASS |
+| CT-09 | Delete barang not found | 404 | 404 | PASS |
 
-Pengujian berikut menggunakan format Lambda
-test event yang merepresentasikan HTTP request.
+Seluruh sembilan skenario dijalankan melalui AWS
+Lambda Console menggunakan Lambda Test Event.
 
-### CT-01 - Initial Connectivity Test
+Status code pada tabel merupakan status aplikasi
+yang dikembalikan oleh Lambda handler.
+
+Status tersebut berbeda dari status HTTP aktual
+yang diperoleh melalui Lambda Function URL.
+
+## 7. Cloud Testing Procedure and Results
+
+Contoh event pada bagian ini dapat digunakan untuk
+mereplikasi skenario pengujian yang telah dilakukan.
+
+### CT-01 — Initial Connectivity Test
 
 Tujuan:
 
-Memastikan Lambda dapat membaca objek
-inventory.json pada Amazon S3.
+Memastikan Lambda dapat membaca objek inventory.json
+pada Amazon S3.
 
 Test event:
 
@@ -202,15 +252,28 @@ Expected result:
 
 - Status code 200.
 - Response dalam format JSON.
-- Total barang bernilai 0 jika inventaris kosong.
-- Tidak terdapat kesalahan akses S3.
+- Total barang bernilai 0.
+- Data inventaris berupa array kosong.
 
-### CT-02 - Create Barang
+Actual result:
+
+- Status code: 200.
+- Total: 0.
+- Data: [].
+
+Result: PASS.
+
+Evidence:
+
+aws_test_get_initial_inventory.png
+
+### CT-02 — Create Barang
 
 Tujuan:
 
-Memastikan sistem dapat menambahkan barang baru
-dan menyimpannya pada Amazon S3.
+Memastikan sistem dapat menambahkan barang baru,
+membuat ID secara otomatis, dan menyimpan data
+pada Amazon S3.
 
 Test event:
 
@@ -226,12 +289,30 @@ Expected result:
 
 - Status code 201.
 - ID barang dibuat secara otomatis.
-- Data barang tersimpan pada S3.
+- Data barang berhasil disimpan.
 
-ID aktual dari response dicatat untuk digunakan
-pada pengujian update dan delete.
+Actual result:
 
-### CT-03 - Read Barang
+- Status code: 201.
+- Message: Barang berhasil ditambahkan.
+- ID barang: BRG-DAC9867BF6AC.
+- Nama barang: Arduino Uno.
+- Kategori: Mikrokontroler.
+- Jumlah: 15.
+- Kondisi: Baik.
+
+Result: PASS.
+
+Evidence:
+
+aws_test_post_create_barang.png
+
+### CT-03 — Read Barang
+
+Tujuan:
+
+Memastikan barang yang telah ditambahkan dapat
+dibaca kembali dari penyimpanan.
 
 Test event:
 
@@ -246,55 +327,119 @@ Expected result:
 
 - Status code 200.
 - Data Arduino Uno muncul dalam daftar.
-- Jumlah barang sesuai dengan data tersimpan.
+- Jumlah barang sesuai dengan data sebelumnya.
 
-### CT-04 - Update Barang
+Actual result:
 
-Ganti ID_AKTUAL dengan ID barang yang dihasilkan
-pada pengujian CT-02.
+- Status code: 200.
+- Total: 1.
+- ID barang: BRG-DAC9867BF6AC.
+- Nama barang: Arduino Uno.
+- Jumlah: 15.
+- Kondisi: Baik.
+
+Result: PASS.
+
+Evidence:
+
+aws_test_get_read_barang.png
+
+### CT-04 — Update Barang
+
+Tujuan:
+
+Memastikan atribut barang dapat diperbarui tanpa
+mengubah identitas unik barang.
 
 Test event:
 
 ```json
 {
     "httpMethod": "PUT",
-    "path": "/barang/ID_AKTUAL",
-    "body": "{\"nama_barang\":\"Arduino Uno\",\"kategori\":\"Mikrokontroler\",\"jumlah\":20,\"kondisi\":\"Baik\"}"
+    "path": "/barang/BRG-DAC9867BF6AC",
+    "body": "{\"nama_barang\":\"Arduino Uno\",\"kategori\":\"Mikrokontroler\",\"jumlah\":12,\"kondisi\":\"Rusak Ringan\"}"
 }
 ```
 
 Expected result:
 
 - Status code 200.
-- Jumlah barang berubah dari 15 menjadi 20.
+- Jumlah barang berubah dari 15 menjadi 12.
+- Kondisi berubah dari Baik menjadi Rusak Ringan.
 - ID barang tetap sama.
-- Perubahan tersimpan pada S3.
 
-### CT-05 - Data Persistence Verification
+Actual result:
 
-Prosedur:
+- Status code: 200.
+- ID barang: BRG-DAC9867BF6AC.
+- Nama barang: Arduino Uno.
+- Kategori: Mikrokontroler.
+- Jumlah: 12.
+- Kondisi: Rusak Ringan.
 
-1. Membuka bucket Amazon S3.
-2. Membuka atau mengunduh inventory.json.
-3. Memeriksa data barang.
-4. Memastikan jumlah barang bernilai 20.
-5. Membandingkan isi objek dengan response Lambda.
+Result: PASS.
+
+Evidence:
+
+aws_test_put_update_barang.png
+
+Apabila pengujian dilakukan kembali, ID pada path
+harus diganti dengan ID yang dihasilkan oleh
+operasi Create terbaru.
+
+### CT-05 — Verify Updated Data
+
+Tujuan:
+
+Memastikan perubahan data hasil operasi Update
+dapat dibaca kembali melalui Lambda.
+
+Test event:
+
+```json
+{
+    "httpMethod": "GET",
+    "path": "/barang"
+}
+```
 
 Expected result:
 
-Data pada Amazon S3 sesuai dengan hasil
-operasi create dan update.
+- Status code 200.
+- Total data bernilai 1.
+- Jumlah barang bernilai 12.
+- Kondisi barang bernilai Rusak Ringan.
+- ID barang tidak berubah.
 
-### CT-06 - Delete Barang
+Actual result:
 
-Ganti ID_AKTUAL dengan ID barang dari CT-02.
+- Status code: 200.
+- Total: 1.
+- ID barang: BRG-DAC9867BF6AC.
+- Jumlah: 12.
+- Kondisi: Rusak Ringan.
+
+Result: PASS.
+
+Evidence:
+
+aws_test_get_verify_update.png
+
+Pengujian ini menunjukkan bahwa perubahan data
+dapat dibaca kembali pada invocation berikutnya.
+
+### CT-06 — Delete Barang
+
+Tujuan:
+
+Memastikan barang dapat dihapus berdasarkan ID.
 
 Test event:
 
 ```json
 {
     "httpMethod": "DELETE",
-    "path": "/barang/ID_AKTUAL"
+    "path": "/barang/BRG-DAC9867BF6AC"
 }
 ```
 
@@ -302,9 +447,26 @@ Expected result:
 
 - Status code 200.
 - Barang berhasil dihapus dari daftar inventaris.
-- Perubahan tersimpan pada S3.
+- Response memuat data barang yang dihapus.
 
-### CT-07 - Read After Delete
+Actual result:
+
+- Status code: 200.
+- ID barang yang dihapus: BRG-DAC9867BF6AC.
+- Operasi penghapusan berhasil.
+
+Result: PASS.
+
+Evidence:
+
+aws_test_delete_barang.png
+
+### CT-07 — Read After Delete
+
+Tujuan:
+
+Memastikan barang yang telah dihapus tidak muncul
+kembali pada daftar inventaris.
 
 Test event:
 
@@ -319,11 +481,29 @@ Expected result:
 
 - Status code 200.
 - Barang yang dihapus tidak muncul kembali.
-- Inventaris kosong apabila tidak ada barang lain.
+- Total data bernilai 0.
+- Data inventaris berupa array kosong.
 
-### CT-08 - Invalid Quantity
+Actual result:
 
-Test event:
+- Status code: 200.
+- Total: 0.
+- Data: [].
+
+Result: PASS.
+
+Evidence:
+
+aws_test_get_final_verification.png
+
+### CT-08 — Invalid Quantity
+
+Tujuan:
+
+Memastikan sistem menolak data barang dengan
+jumlah negatif.
+
+Contoh test event untuk mereplikasi pengujian:
 
 ```json
 {
@@ -339,15 +519,33 @@ Expected result:
 - Sistem menolak jumlah negatif.
 - Data tidak ditambahkan ke inventaris.
 
-### CT-09 - Barang Not Found
+Actual result:
+
+- Status code: 400.
+- Message: Jumlah barang tidak boleh negatif.
+
+Result: PASS.
+
+Evidence:
+
+aws_test_post_invalid_jumlah.png
+
+Status 400 merupakan response yang diharapkan
+pada pengujian validasi input.
+
+### CT-09 — Delete Barang Not Found
+
+Tujuan:
+
+Memastikan sistem menangani permintaan penghapusan
+terhadap ID barang yang tidak tersedia.
 
 Test event:
 
 ```json
 {
-    "httpMethod": "PUT",
-    "path": "/barang/BRG-NOT-FOUND",
-    "body": "{\"nama_barang\":\"Multimeter\",\"kategori\":\"Alat Ukur\",\"jumlah\":5,\"kondisi\":\"Baik\"}"
+    "httpMethod": "DELETE",
+    "path": "/barang/BRG-NOTFOUND"
 }
 ```
 
@@ -358,115 +556,423 @@ Expected result:
   tidak ditemukan.
 - Data inventaris tidak berubah.
 
-### CT-10 - Invalid Endpoint
+Actual result:
 
-Test event:
+- Status code: 404.
+- Message: Barang dengan ID BRG-NOTFOUND tidak ditemukan.
 
-```json
-{
-    "httpMethod": "GET",
-    "path": "/invalid"
-}
-```
+Result: PASS.
+
+Evidence:
+
+aws_test_delete_not_found.png
+
+Status 404 merupakan response yang diharapkan
+pada skenario barang tidak ditemukan.
+
+## 8. Infrastructure and Connectivity Verification
+
+### IV-01 — Final S3 Storage Verification
+
+Tujuan:
+
+Memastikan isi akhir objek inventory.json sesuai
+dengan hasil rangkaian pengujian CRUD.
+
+Prosedur:
+
+1. Membuka layanan Amazon S3.
+2. Membuka bucket labinventory-534903-20261125.
+3. Memilih objek inventory.json.
+4. Membuka isi objek.
+5. Memeriksa data inventaris akhir.
 
 Expected result:
 
-- Status code 404.
-- Sistem menolak endpoint yang tidak tersedia.
+```json
+[]
+```
 
-### CT-11 - CloudWatch Log Verification
+Actual result:
+
+```json
+[]
+```
+
+Objek inventory.json tetap tersedia dengan ukuran
+2 bytes dan berisi array JSON kosong.
+
+Result: PASS.
+
+Evidence:
+
+aws_s3_final_inventory.png
+
+### IV-02 — CloudWatch Log Verification
+
+Tujuan:
+
+Memastikan Lambda dapat menghasilkan log eksekusi
+melalui Amazon CloudWatch.
+
+Log group:
+
+/aws/lambda/labinventory-crud
 
 Prosedur:
 
 1. Membuka layanan Amazon CloudWatch.
 2. Membuka log group Lambda.
-3. Memilih log stream dari pengujian terbaru.
-4. Memeriksa informasi eksekusi dan error.
+3. Memilih log stream yang tersedia.
+4. Memeriksa informasi request dan eksekusi.
+
+Actual result:
+
+- Log group tersedia.
+- Log stream tersedia.
+- Informasi START, END, dan REPORT tersedia.
+- Informasi request aplikasi tersedia.
+- Informasi durasi dan penggunaan memori tersedia.
+
+Result: PASS.
+
+Evidence:
+
+- aws_cloudwatch_log_group.png
+- aws_cloudwatch_log_events.png
+
+### IV-03 — HTTP Interface Configuration
+
+Tujuan:
+
+Memastikan aplikasi memiliki antarmuka HTTPS
+dengan mekanisme autentikasi yang sesuai.
+
+Actual configuration:
+
+| Parameter | Value |
+|---|---|
+| Interface | Lambda Function URL |
+| Authentication | AWS_IAM |
+| Invoke Mode | BUFFERED |
+| Protocol | HTTPS |
+| CORS | Not enabled |
+
+Result: PASS.
+
+Evidence:
+
+aws_lambda_function_url.png
+
+### IV-04 — Authenticated HTTP Connectivity
+
+Tujuan:
+
+Memastikan client yang memiliki autentikasi dan
+otorisasi AWS dapat mengakses aplikasi melalui
+endpoint HTTPS aktual.
+
+Testing environment:
+
+- AWS CloudShell.
+- Python.
+- boto3.
+- Botocore SigV4Auth.
+- AWS session credentials.
+
+Request:
+
+- Method: GET.
+- Path: /barang.
+- Authentication: AWS Signature Version 4.
 
 Expected result:
 
-Log eksekusi Lambda tersedia apabila execution
-role memiliki izin pencatatan log.
+- HTTP Status 200.
+- Response dalam format JSON.
+- Data inventaris sesuai dengan penyimpanan.
 
-### CT-12 - HTTP Interface Verification
+Actual result:
 
-Pengujian dilakukan apabila API Gateway atau
-Lambda Function URL berhasil dikonfigurasi
-dengan mekanisme akses yang sesuai.
+```text
+HTTP Status: 200
+```
 
-Prosedur:
+Response body:
 
-1. Mengirimkan request HTTP yang diizinkan.
-2. Memeriksa HTTP status code.
-3. Memeriksa response JSON.
-4. Memastikan request diproses oleh Lambda.
-5. Memastikan perubahan data tersimpan pada S3.
+```json
+{
+    "message": "Data inventaris berhasil dibaca.",
+    "total": 0,
+    "data": []
+}
+```
 
-Apabila HTTP interface tidak tersedia,
-pengujian ditandai sebagai Not Applicable
-dengan alasan yang didokumentasikan.
+Result: PASS.
 
-## 8. Testing Evidence
+Evidence:
 
-Bukti pengujian yang direncanakan:
+aws_http_connectivity_test.png
 
-| Evidence | Description |
+Pengujian ini merupakan pengujian HTTP aktual,
+berbeda dari direct invocation melalui Lambda Console.
+
+Pengujian HTTP langsung hanya dilakukan pada metode
+GET. Operasi POST, PUT, dan DELETE diuji melalui
+Lambda Test Event.
+
+### IV-05 — S3 Public Access Verification
+
+Tujuan:
+
+Memastikan bucket tidak dikonfigurasi untuk
+memberikan akses publik.
+
+Expected configuration:
+
+Block All Public Access: On.
+
+Actual configuration:
+
+Block All Public Access: On.
+
+Result: PASS.
+
+Evidence:
+
+aws_s3_block_public_access.png
+
+### IV-06 — S3 Encryption Verification
+
+Tujuan:
+
+Memastikan konfigurasi enkripsi penyimpanan
+Amazon S3 telah diaktifkan.
+
+Expected configuration:
+
+Server-side encryption with Amazon S3 managed
+keys (SSE-S3).
+
+Actual configuration:
+
+SSE-S3.
+
+Result: PASS.
+
+Evidence:
+
+aws_s3_default_encryption.png
+
+### IV-07 — IAM Execution Role Verification
+
+Tujuan:
+
+Memastikan Lambda menggunakan execution role
+yang tersedia pada lingkungan sandbox.
+
+Actual configuration:
+
+- Execution role: LabRole.
+- Akses Amazon S3 berhasil digunakan.
+- Pencatatan CloudWatch berhasil digunakan.
+
+Result: PASS.
+
+Evidence:
+
+- aws_lambda_s3_permissions.png
+- aws_lambda_cloudwatch_permissions.png
+
+Pengujian ini memverifikasi konfigurasi role dan
+keberhasilan akses layanan yang diperlukan aplikasi.
+
+Pengujian tidak mencakup audit seluruh kebijakan IAM
+atau pembuktian penerapan least privilege secara penuh.
+
+## 9. Testing Evidence
+
+Screenshot pengujian disimpan pada folder:
+
+evidence/raw/
+
+### 9.1 Local Testing Evidence
+
+| File | Description |
 |---|---|
-| Local Unit Testing | Hasil 20 pengujian lokal |
-| Combined Testing | Hasil 35 pengujian otomatis |
-| Connectivity Test | Lambda berhasil membaca S3 |
-| Create Test | Response penambahan barang |
-| Read Test | Response daftar barang |
-| Update Test | Response pembaruan barang |
-| S3 Persistence | Isi objek inventory.json |
-| Delete Test | Response penghapusan barang |
-| Read After Delete | Verifikasi hasil penghapusan |
-| Validation Test | Penolakan data tidak valid |
-| CloudWatch Logs | Log eksekusi Lambda |
-| HTTP Interface | Bukti akses HTTP jika tersedia |
+| 01_local_unit_testing.png | Hasil 20 unit tests |
+| 02_combined_testing.png | Hasil 35 automated tests |
 
-Screenshot disimpan pada folder evidence/raw
-dan tidak diunggah langsung ke repository publik.
+### 9.2 AWS Functional Testing Evidence
 
-## 9. Test Result Classification
+| File | Description |
+|---|---|
+| aws_test_get_initial_inventory.png | Initial connectivity test |
+| aws_test_post_create_barang.png | Create barang |
+| aws_test_get_read_barang.png | Read barang |
+| aws_test_put_update_barang.png | Update barang |
+| aws_test_get_verify_update.png | Verifikasi data setelah update |
+| aws_test_delete_barang.png | Delete barang |
+| aws_test_get_final_verification.png | Verifikasi setelah delete |
+| aws_test_post_invalid_jumlah.png | Validasi jumlah negatif |
+| aws_test_delete_not_found.png | Penanganan ID tidak ditemukan |
+
+### 9.3 Infrastructure Verification Evidence
+
+| File | Description |
+|---|---|
+| aws_s3_final_inventory.png | Isi akhir inventory.json |
+| aws_cloudwatch_log_group.png | CloudWatch log group |
+| aws_cloudwatch_log_events.png | Log eksekusi Lambda |
+| aws_lambda_function_url.png | Konfigurasi Function URL |
+| aws_http_connectivity_test.png | Hasil pengujian HTTPS |
+| aws_s3_block_public_access.png | Konfigurasi Block Public Access |
+| aws_s3_default_encryption.png | Konfigurasi SSE-S3 |
+| aws_lambda_s3_permissions.png | Informasi izin akses S3 |
+| aws_lambda_cloudwatch_permissions.png | Informasi izin CloudWatch |
+
+Bukti provisioning dan konfigurasi lainnya
+didokumentasikan pada evidence/README.md.
+
+Screenshot mentah tidak dilacak oleh Git dan
+tidak diunggah langsung ke repository publik.
+
+Informasi sensitif perlu disensor sebelum screenshot
+disertakan dalam laporan atau dibagikan kepada
+pihak lain.
+
+## 10. Test Result Classification
 
 | Status | Description |
 |---|---|
-| Passed | Hasil aktual sesuai expected result |
-| Failed | Hasil aktual tidak sesuai expected result |
-| Pending | Pengujian belum dilaksanakan |
-| Blocked | Pengujian terhambat kendala teknis |
-| Conditional | Bergantung pada konfigurasi yang tersedia |
-| Not Applicable | Pengujian tidak relevan pada konfigurasi final |
+| PASS | Hasil aktual sesuai expected result |
+| FAIL | Hasil aktual tidak sesuai expected result |
+| NOT TESTED | Pengujian belum dilaksanakan |
+| BLOCKED | Pengujian terhambat kendala teknis |
+| NOT APPLICABLE | Pengujian tidak relevan pada konfigurasi final |
 
-Status pengujian hanya diperbarui setelah
-hasil aktual diperoleh.
+Status PASS hanya diberikan pada skenario yang
+telah dilaksanakan dan memiliki hasil aktual.
 
-## 10. Acceptance Criteria
+Status 400 dan 404 pada negative testing dapat
+diklasifikasikan sebagai PASS apabila sesuai
+dengan expected result.
 
-Prototipe dinyatakan memenuhi target fungsional
-awal apabila:
+## 11. Testing Summary
 
-- Seluruh pengujian lokal berhasil.
-- Lambda dapat menjalankan kode aplikasi.
-- Konektivitas Lambda dengan S3 berhasil.
-- Empat operasi CRUD berhasil.
-- Persistensi data dapat diverifikasi.
-- Input tidak valid dapat ditangani.
-- Bukti pengujian tersedia.
+### 11.1 Automated Local Testing
 
-Ketersediaan endpoint HTTP aktual dilaporkan
-secara terpisah dari pengujian Lambda test event.
+| Category | Total | Passed | Failed |
+|---|---:|---:|---:|
+| Inventory Unit Testing | 20 | 20 | 0 |
+| AWS Integration Simulation | 15 | 15 | 0 |
+| Total | 35 | 35 | 0 |
 
-## 11. Testing Status
+Local automated testing success rate: 100%.
 
-Local Testing: PASSED
+### 11.2 AWS Functional Testing
 
-Total Local Tests: 35
+| Category | Total | Passed | Failed |
+|---|---:|---:|---:|
+| Positive Functional Testing | 7 | 7 | 0 |
+| Negative Functional Testing | 2 | 2 | 0 |
+| Total | 9 | 9 | 0 |
 
-Cloud Testing: PENDING
+AWS functional testing success rate: 100%.
 
-HTTP Interface Testing: CONDITIONAL
+### 11.3 Infrastructure Verification
 
-Dokumen ini akan diperbarui berdasarkan hasil
-pengujian aktual pada AWS Academy Sandbox.
+| Verification | Result |
+|---|---|
+| Final S3 storage | PASS |
+| CloudWatch Logs | PASS |
+| Function URL configuration | PASS |
+| Authenticated HTTP connectivity | PASS |
+| S3 Block Public Access | PASS |
+| S3 default encryption | PASS |
+| IAM execution role | PASS |
+
+Seluruh pemeriksaan infrastruktur yang tercantum
+pada bagian ini telah berhasil dilakukan.
+
+Persentase keberhasilan hanya berlaku untuk
+skenario yang benar-benar dilaksanakan.
+
+## 12. Testing Limitations
+
+Pengujian yang belum dilakukan atau berada di luar
+ruang lingkup prototipe meliputi:
+
+| Test Scenario | Status |
+|---|---|
+| Direct HTTP POST request | NOT TESTED |
+| Direct HTTP PUT request | NOT TESTED |
+| Direct HTTP DELETE request | NOT TESTED |
+| Invalid endpoint pada AWS aktual | NOT TESTED |
+| Unauthorized HTTP request | NOT TESTED |
+| Concurrent write testing | NOT TESTED |
+| Load testing | NOT TESTED |
+| Performance benchmarking | NOT TESTED |
+| Penetration testing | NOT TESTED |
+| Full IAM least-privilege audit | NOT TESTED |
+| Frontend testing | NOT APPLICABLE |
+
+Penanganan endpoint tidak valid dan HTTP method
+yang tidak didukung telah diuji secara lokal.
+
+Keberhasilan pengujian tidak membuktikan bahwa
+sistem telah memenuhi seluruh kebutuhan keamanan,
+skalabilitas, dan reliabilitas lingkungan produksi.
+
+## 13. Acceptance Criteria
+
+| Acceptance Criteria | Result |
+|---|---|
+| Seluruh pengujian otomatis lokal berhasil | PASS |
+| Lambda dapat menjalankan source code aplikasi | PASS |
+| Lambda dapat membaca data dari S3 | PASS |
+| Lambda dapat menulis data ke S3 | PASS |
+| Operasi Create berhasil | PASS |
+| Operasi Read berhasil | PASS |
+| Operasi Update berhasil | PASS |
+| Operasi Delete berhasil | PASS |
+| Persistensi data dapat diverifikasi | PASS |
+| Input jumlah negatif dapat ditangani | PASS |
+| ID barang tidak ditemukan dapat ditangani | PASS |
+| Endpoint HTTPS berhasil dikonfigurasi | PASS |
+| Konektivitas HTTPS terautentikasi berhasil | PASS |
+| CloudWatch Logs tersedia | PASS |
+| Konfigurasi keamanan dasar S3 terverifikasi | PASS |
+| Bukti pengujian tersedia | PASS |
+
+Seluruh acceptance criteria teknis utama prototipe
+LabInventory telah terpenuhi.
+
+## 14. Testing Status and Conclusion
+
+**Overall Status: PASSED**
+
+Ringkasan hasil pengujian:
+
+- Local automated testing: 35/35 PASS.
+- AWS functional testing: 9/9 PASS.
+- Authenticated HTTP connectivity: HTTP 200 OK.
+- Final S3 storage verification: PASS.
+- CloudWatch Logs verification: PASS.
+- Basic storage security verification: PASS.
+- IAM execution role verification: PASS.
+
+Hasil pengujian menunjukkan bahwa LabInventory
+berhasil menjalankan fungsi utama pengelolaan
+inventaris barang laboratorium.
+
+AWS Lambda berhasil terintegrasi dengan Amazon S3
+untuk menjalankan seluruh operasi CRUD.
+
+Lambda Function URL berhasil menyediakan akses
+HTTPS terautentikasi, sedangkan Amazon CloudWatch
+berhasil mencatat informasi eksekusi aplikasi.
+
+Sistem telah memenuhi target fungsional prototipe
+akademik dengan batasan pengujian dan implementasi
+yang telah didokumentasikan.

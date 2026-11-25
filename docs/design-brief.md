@@ -7,148 +7,188 @@
 - NIM: 24/534903/TK/59310
 - Kelas: Teknologi Informasi/B
 - Mata Kuliah: Cloud Computing
+- Judul Proyek: LabInventory — Sistem Inventaris Barang Laboratorium Berbasis Cloud
 
-## 1. Gambaran Umum
+## 1. Gambaran Umum dan Latar Belakang
 
 LabInventory merupakan prototipe sistem inventaris barang
-laboratorium berbasis cloud yang dirancang untuk membantu
+laboratorium berbasis cloud yang dikembangkan untuk membantu
 pengelolaan data peralatan dan barang laboratorium secara
 terpusat.
 
-Sistem menyediakan fungsi penambahan, pembacaan, pembaruan,
-dan penghapusan data barang melalui antarmuka backend.
+Pencatatan inventaris secara manual dapat menyebabkan
+ketidaksesuaian data, kesulitan memperbarui informasi barang,
+dan keterbatasan akses terhadap informasi inventaris.
 
-## 2. Latar Belakang
-
-Pencatatan inventaris laboratorium secara manual dapat
-menyebabkan ketidaksesuaian data, kesulitan memperbarui
-informasi barang, dan keterbatasan akses terhadap informasi
-inventaris.
-
-Pemanfaatan cloud computing memungkinkan data inventaris
-disimpan secara terpusat serta menyediakan infrastruktur
-yang dapat dikelola tanpa harus membangun server fisik
+LabInventory memanfaatkan pendekatan serverless pada Amazon
+Web Services (AWS) untuk menyediakan fungsi pengelolaan
+data tanpa harus menyediakan dan mengelola server fisik
 secara mandiri.
 
-## 3. Tujuan
+## 2. Tujuan
 
-- Menyediakan sistem pengelolaan data inventaris.
-- Mengimplementasikan operasi CRUD.
-- Memanfaatkan layanan cloud untuk pemrosesan dan
-  penyimpanan data.
-- Melakukan konfigurasi awal infrastruktur AWS.
-- Menguji fungsi aplikasi dan konektivitas layanan cloud.
+- Menyediakan sistem pengelolaan data inventaris laboratorium.
+- Mengimplementasikan empat operasi CRUD terhadap entitas Barang.
+- Memanfaatkan layanan cloud untuk pemrosesan dan penyimpanan data.
+- Mengimplementasikan konfigurasi dasar infrastruktur AWS.
+- Menguji fungsi aplikasi, keamanan dasar, dan konektivitas layanan cloud.
 
-## 4. Ruang Lingkup
+## 3. Ruang Lingkup
 
-Sistem berfokus pada pengelolaan satu entitas, yaitu Barang.
+Sistem berfokus pada pengelolaan satu entitas, yaitu Barang,
+dengan empat fungsi utama:
 
-Fitur yang disediakan:
-
-1. Menambahkan barang.
+1. Menambahkan barang baru.
 2. Menampilkan seluruh data barang.
 3. Memperbarui data barang berdasarkan ID.
 4. Menghapus data barang berdasarkan ID.
 
-Pengembangan antarmuka pengguna, autentikasi pengguna
-aplikasi, peminjaman barang, dan pelaporan inventaris
-tidak termasuk dalam ruang lingkup prototipe ini.
+Frontend, autentikasi pengguna pada tingkat aplikasi,
+peminjaman barang, dan pelaporan inventaris tidak termasuk
+dalam ruang lingkup prototipe.
 
-## 5. Model Data
+## 4. Model Data
 
 | Atribut | Tipe Data | Keterangan |
 |---|---|---|
-| id_barang | String | Identitas unik, dibuat otomatis |
-| nama_barang | String | Nama barang |
-| kategori | String | Kategori barang |
+| id_barang | String | Identitas unik yang dibuat otomatis |
+| nama_barang | String | Nama barang, tidak boleh kosong |
+| kategori | String | Kategori barang, tidak boleh kosong |
 | jumlah | Integer | Jumlah barang, minimal 0 |
-| kondisi | String | Kondisi barang |
+| kondisi | String | Baik, Rusak Ringan, atau Rusak Berat |
 
-Nilai kondisi yang diperbolehkan:
+Data inventaris disimpan dalam bentuk array JSON pada
+objek inventory.json di Amazon S3.
 
-- Baik
-- Rusak Ringan
-- Rusak Berat
+## 5. Rancangan API
 
-## 6. Rancangan API
-
-| Method | Endpoint | Fungsi |
-|---|---|---|
-| POST | /barang | Menambahkan barang |
-| GET | /barang | Menampilkan seluruh barang |
-| PUT | /barang/{id_barang} | Memperbarui barang |
-| DELETE | /barang/{id_barang} | Menghapus barang |
+| Method | Endpoint | Fungsi | Success Status |
+|---|---|---|---|
+| POST | /barang | Menambahkan barang | 201 Created |
+| GET | /barang | Menampilkan seluruh barang | 200 OK |
+| PUT | /barang/{id_barang} | Memperbarui barang | 200 OK |
+| DELETE | /barang/{id_barang} | Menghapus barang | 200 OK |
 
 Pertukaran data menggunakan format JSON. Operasi PUT
 menggunakan pembaruan penuh terhadap atribut barang
 dengan mempertahankan ID yang sudah ada.
 
-## 7. Rancangan Arsitektur Cloud
+Sistem juga menangani kesalahan input dengan status
+400 Bad Request dan barang yang tidak ditemukan dengan
+status 404 Not Found.
 
-Pendekatan awal menggunakan arsitektur serverless.
+## 6. Arsitektur Cloud
 
-Layanan AWS yang direncanakan:
+LabInventory diimplementasikan menggunakan arsitektur
+serverless pada AWS Academy Cloud Foundations Sandbox
+Lingkungan Hidup, region US East (N. Virginia), us-east-1.
 
-- AWS Lambda: menjalankan logika aplikasi dan CRUD.
-- Amazon S3: menyimpan data inventaris dalam format JSON.
-- AWS IAM: mengatur izin akses antar layanan.
-- Amazon CloudWatch: menyediakan pencatatan log aplikasi.
+| Layanan | Peran |
+|---|---|
+| AWS Lambda | Menjalankan logika CRUD, routing, dan validasi data |
+| Lambda Function URL | Menyediakan antarmuka HTTPS |
+| Amazon S3 | Menyimpan data inventaris dalam format JSON |
+| AWS IAM | Mengatur autentikasi dan izin akses layanan |
+| Amazon CloudWatch | Mencatat log dan informasi eksekusi Lambda |
 
-Antarmuka HTTP akan disesuaikan dengan layanan dan izin
-yang tersedia pada AWS Academy Sandbox.
+Client mengirimkan request HTTPS melalui Lambda Function
+URL menggunakan autentikasi AWS_IAM. AWS Lambda memproses
+request, menjalankan operasi CRUD, serta membaca atau
+memperbarui data pada Amazon S3.
 
-Apabila antarmuka HTTP tidak dapat dikonfigurasi,
-pengujian fungsi dapat dilakukan melalui Lambda Console
-menggunakan test event.
+Informasi eksekusi Lambda dicatat melalui Amazon CloudWatch.
 
-## 8. Keamanan dan Jaringan
+Lambda Function URL dipilih karena menyediakan antarmuka
+HTTPS langsung tanpa memerlukan komponen API Gateway.
 
-Bucket Amazon S3 direncanakan bersifat privat dengan
-Block Public Access diaktifkan.
+Amazon S3 dipilih karena kebutuhan penyimpanan prototipe
+masih sederhana dan hanya mencakup satu entitas utama.
 
-AWS Lambda menggunakan execution role yang tersedia
-dan diizinkan dalam lingkungan sandbox.
+Diagram dan konfigurasi arsitektur secara lengkap tersedia
+pada dokumen architecture.md.
 
-Kredensial AWS tidak disimpan dalam kode sumber maupun
-repository GitHub.
+## 7. Keamanan dan Jaringan
 
-Arsitektur awal tidak memerlukan konfigurasi VPC khusus.
-Akses antar layanan mengikuti mekanisme keamanan AWS
-dan kebijakan IAM yang berlaku.
+Implementasi menerapkan konfigurasi keamanan berikut:
 
-## 9. Strategi Pengujian
+- Amazon S3 Block Public Access diaktifkan.
+- Default encryption menggunakan SSE-S3.
+- AWS Lambda menggunakan execution role LabRole.
+- Lambda Function URL menggunakan autentikasi AWS_IAM.
+- Request HTTPS ditandatangani menggunakan AWS Signature Version 4.
+- Kredensial AWS tidak disimpan dalam source code atau repository.
+- Screenshot mentah dikecualikan dari pelacakan Git.
 
-Pengujian dilakukan secara bertahap melalui:
+Arsitektur tidak menggunakan custom VPC, subnet, NAT Gateway,
+atau Internet Gateway. Komunikasi antar layanan memanfaatkan
+jaringan yang dikelola AWS dan menggunakan HTTPS.
 
-1. Unit testing terhadap logika CRUD.
-2. Pengujian validasi data dan penanganan kesalahan.
-3. Simulasi integrasi Lambda dan S3 secara lokal.
-4. Pengujian fungsi pada lingkungan AWS.
-5. Verifikasi penyimpanan data dan log aplikasi.
+AWS Lambda dan Amazon S3 berada pada region yang sama,
+yaitu us-east-1.
 
-## 10. Batasan dan Asumsi
+## 8. Hasil Pengujian
 
-Sistem merupakan prototipe untuk kebutuhan akademik
-dan belum ditujukan untuk penggunaan produksi.
+| Pengujian | Hasil |
+|---|---|
+| Unit testing lokal | 20/20 PASS |
+| Simulasi integrasi AWS secara lokal | 15/15 PASS |
+| Pengujian fungsional AWS Lambda | 9/9 PASS |
+| Konektivitas HTTPS melalui Function URL | HTTP 200 OK |
+| Verifikasi penyimpanan Amazon S3 | PASS |
+| Verifikasi Amazon CloudWatch Logs | PASS |
+| Verifikasi Block Public Access dan SSE-S3 | PASS |
 
-Penyimpanan menggunakan satu objek JSON sehingga belum
-mendukung pembaruan data secara bersamaan dengan aman.
+Seluruh operasi CRUD berhasil diuji melalui Lambda Test
+Event, termasuk validasi jumlah negatif dan penanganan
+barang yang tidak ditemukan.
 
-Pemilihan layanan, konfigurasi IAM, region, dan mekanisme
-akses aplikasi bergantung pada fasilitas yang tersedia
-dalam AWS Academy Sandbox.
+Pengujian konektivitas HTTPS dilakukan menggunakan AWS
+CloudShell melalui metode GET /barang dengan autentikasi
+AWS_IAM dan menghasilkan HTTP Status 200.
 
-## 11. Status Implementasi
+Pemeriksaan akhir Amazon S3 menunjukkan bahwa objek
+inventory.json kembali berisi array kosong setelah
+rangkaian pengujian CRUD dan validasi selesai.
 
-Logika CRUD, penyimpanan lokal, adapter Amazon S3,
-dan Lambda handler telah dikembangkan.
+## 9. Batasan dan Asumsi
 
-Sebanyak 35 pengujian otomatis telah berhasil dijalankan
-secara lokal.
+- Sistem merupakan prototipe akademik, bukan sistem produksi.
+- Penyimpanan menggunakan satu objek JSON.
+- Concurrent write belum ditangani secara aman.
+- IAM mengikuti kebijakan LabRole bawaan sandbox.
+- Belum tersedia frontend dan autentikasi pengguna aplikasi.
+- Pengujian HTTP langsung baru mencakup metode GET.
+- Belum dilakukan load testing.
+- Ketersediaan infrastruktur mengikuti kebijakan dan masa
+  aktif AWS Academy Sandbox.
 
-Provisioning infrastruktur, konektivitas antar layanan,
-dan pengujian langsung pada AWS masih menunggu
-pelaksanaan sandbox.
+Pengembangan berikutnya dapat mempertimbangkan penggunaan
+Amazon DynamoDB, custom IAM policy berdasarkan prinsip
+least privilege, dan antarmuka pengguna.
 
-Dokumen ini merupakan rancangan awal dan akan
-diperbarui berdasarkan hasil implementasi aktual.
+## 10. Repository
+
+Source code, dokumentasi arsitektur, deployment plan,
+testing plan, dan riwayat pengembangan tersedia pada:
+
+https://github.com/aurelia-mutiah/labinventory-cloud
+
+Repository menggunakan Git untuk mencatat perkembangan
+implementasi secara bertahap.
+
+## 11. Status Implementasi dan Kesimpulan
+
+**Status: Implemented and Tested**
+
+LabInventory telah berhasil diimplementasikan sebagai
+prototipe sistem inventaris barang laboratorium berbasis
+cloud menggunakan pendekatan serverless.
+
+Integrasi AWS Lambda dengan Amazon S3 berhasil menjalankan
+seluruh operasi CRUD. Lambda Function URL menyediakan akses
+HTTPS terautentikasi, sedangkan Amazon CloudWatch menyediakan
+pencatatan aktivitas eksekusi.
+
+Hasil pengujian menunjukkan bahwa fungsi utama aplikasi,
+konektivitas layanan cloud, dan konfigurasi keamanan dasar
+telah berjalan sesuai dengan tujuan pengembangan prototipe.
