@@ -1,0 +1,38 @@
+
+[
+    {
+        "id_barang": "BRG001",
+        "nama_barang": "Arduino Uno",
+        "kategori": "Mikrokontroler",
+        "jumlah": 15,
+        "kondisi": "Baik"
+    },
+    {
+        "id_barang": "BRG002",
+        "nama_barang": "Multimeter Digital",
+        "kategori": "Alat Ukur",
+        "jumlah": 8,
+        "kondisi": "Baik"
+    },
+    {
+        "id_barang": "BRG003",
+        "nama_barang": "Breadboard",
+        "kategori": "Komponen Elektronika",
+        "jumlah": 25,
+        "kondisi": "Baik"
+    },
+    {
+        "id_barang": "BRG004",
+        "nama_barang": "Osiloskop Digital",
+        "kategori": "Alat Ukur",
+        "jumlah": 3,
+        "kondisi": "Rusak Ringan"
+    },
+    {
+        "id_barang": "BRG005",
+        "nama_barang": "Solder Listrik",
+        "kategori": "Peralatan Praktikum",
+        "jumlah": 2,
+        "kondisi": "Rusak Berat"
+    }
+]
