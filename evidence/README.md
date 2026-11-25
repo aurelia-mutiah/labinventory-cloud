@@ -3,17 +3,13 @@
 
 ## 1. Purpose
 
-Folder evidence digunakan untuk mengelola bukti
-pengembangan, konfigurasi infrastruktur, dan hasil
-pengujian aplikasi LabInventory.
+Folder evidence digunakan untuk mengelola bukti pengembangan, konfigurasi infrastruktur, deployment, dan hasil pengujian aplikasi LabInventory.
 
-Bukti dikumpulkan untuk mendukung laporan tugas
-Cloud Computing dan menunjukkan kesesuaian antara
-rancangan dengan implementasi aktual pada AWS Academy
-Cloud Foundations Sandbox Lingkungan Hidup.
+Bukti dikumpulkan untuk mendukung laporan tugas Cloud Computing dan menunjukkan kesesuaian antara rancangan dengan implementasi aktual pada AWS Academy Cloud Foundations Sandbox Lingkungan Hidup.
 
-Dokumen ini berfungsi sebagai indeks bukti pengerjaan
-dan referensi penyusunan laporan akhir.
+Dokumen ini berfungsi sebagai indeks bukti pengerjaan dan referensi penyusunan laporan akhir.
+
+---
 
 ## 2. Directory Structure
 
@@ -29,41 +25,63 @@ evidence/
     ├── 06_s3_initial_data_uploaded.png
     ├── 07_lambda_function_created.png
     ├── 08_lambda_code_deployed.png
-    └── aws_*.png
+    ├── aws_cloudwatch_log_events.png
+    ├── aws_cloudwatch_log_group.png
+    ├── aws_http_connectivity_test.png
+    ├── aws_lambda_cloudwatch_permissions.png
+    ├── aws_lambda_environment_variables.png
+    ├── aws_lambda_function_url.png
+    ├── aws_lambda_general_configuration.png
+    ├── aws_lambda_runtime_settings.png
+    ├── aws_lambda_s3_permissions.png
+    ├── aws_s3_block_public_access.png
+    ├── aws_s3_default_encryption.png
+    ├── aws_s3_final_inventory.png
+    ├── aws_test_delete_barang.png
+    ├── aws_test_delete_not_found.png
+    ├── aws_test_get_final_verification.png
+    ├── aws_test_get_initial_inventory.png
+    ├── aws_test_get_read_barang.png
+    ├── aws_test_get_verify_update.png
+    ├── aws_test_post_create_barang.png
+    ├── aws_test_post_invalid_jumlah.png
+    ├── aws_test_put_update_barang.png
+    ├── final_github_repository.png
+    ├── final_git_commit_history.png
+    └── final_architecture_diagram.png
 ```
 
-Folder raw digunakan untuk menyimpan screenshot asli
-secara lokal.
+Folder `raw/` digunakan untuk menyimpan screenshot asli secara lokal.
 
-Folder tersebut dikecualikan dari pelacakan Git melalui
-.gitignore untuk mencegah informasi sensitif ikut
-terunggah ke repository publik.
+Folder tersebut dikecualikan dari pelacakan Git melalui `.gitignore` untuk mencegah informasi sensitif ikut terunggah ke repository publik.
 
-Dokumen README.md tetap dilacak oleh Git sebagai
-indeks bukti pengerjaan.
+Dokumen `README.md` tetap dilacak oleh Git sebagai indeks bukti pengerjaan.
+
+---
 
 ## 3. Evidence Naming Convention
 
-Screenshot menggunakan dua format penamaan:
+Screenshot menggunakan tiga format penamaan:
 
 ```text
 NN_deskripsi_bukti.png
 aws_deskripsi_bukti.png
+final_deskripsi_bukti.png
 ```
 
 Keterangan:
 
-- NN: nomor urut pengumpulan bukti awal.
-- aws: bukti konfigurasi atau pengujian AWS.
-- deskripsi_bukti: penjelasan singkat isi screenshot.
-- png: format gambar.
+- `NN`: nomor urut pengumpulan bukti awal.
+- `aws`: bukti konfigurasi atau pengujian AWS.
+- `final`: bukti finalisasi repository dan arsitektur.
+- `deskripsi_bukti`: penjelasan singkat isi screenshot.
+- `png`: format gambar.
 
-Nama file yang telah digunakan selama implementasi
-dipertahankan agar sesuai dengan bukti aktual.
+Nama file yang telah digunakan selama implementasi dipertahankan agar sesuai dengan bukti aktual.
 
-ID evidence pada dokumen ini digunakan sebagai
-referensi dokumentasi dan tidak mengharuskan
-perubahan nama file screenshot.
+ID evidence pada dokumen ini digunakan sebagai referensi dokumentasi dan tidak mengharuskan perubahan nama file screenshot.
+
+---
 
 ## 4. Evidence Checklist
 
@@ -76,8 +94,17 @@ perubahan nama file screenshot.
 
 Total: 2 screenshots.
 
-Bukti menunjukkan bahwa logika aplikasi dan simulasi
-integrasi AWS telah diuji sebelum deployment.
+Bukti menunjukkan bahwa logika aplikasi dan simulasi integrasi AWS telah diuji sebelum deployment.
+
+Hasil pengujian lokal:
+
+| Test Category | Total | Passed |
+|---|---:|---:|
+| Inventory Unit Testing | 20 | 20 |
+| AWS Integration Testing | 15 | 15 |
+| Total | 35 | 35 |
+
+Seluruh automated tests berhasil dijalankan tanpa kegagalan.
 
 ### 4.2 AWS Environment
 
@@ -88,8 +115,18 @@ integrasi AWS telah diuji sebelum deployment.
 
 Total: 2 screenshots.
 
-Bukti menunjukkan lingkungan cloud yang digunakan
-untuk implementasi LabInventory.
+Lingkungan implementasi:
+
+| Configuration | Value |
+|---|---|
+| Platform | AWS Academy |
+| Course | Cloud Foundations |
+| Environment | Sandbox Lingkungan Hidup |
+| Region | us-east-1 |
+| Region Name | US East (N. Virginia) |
+| Architecture | Serverless |
+
+Bukti menunjukkan lingkungan cloud yang digunakan untuk implementasi LabInventory.
 
 ### 4.3 Amazon S3 Provisioning and Storage
 
@@ -103,15 +140,21 @@ Total: 3 screenshots.
 
 Resource penyimpanan:
 
-- Bucket: labinventory-534903-20261125.
-- Region: us-east-1.
-- Object key: inventory.json.
-- Data format: JSON.
-- Initial data: [].
-- Final data: [].
+| Configuration | Value |
+|---|---|
+| Service | Amazon S3 |
+| Bucket Name | labinventory-534903-20261125 |
+| Region | us-east-1 |
+| Object Key | inventory.json |
+| Data Format | JSON |
+| Initial Data | [] |
+| Final Data | [] |
 
-Bukti menunjukkan keberhasilan provisioning,
-inisialisasi penyimpanan, dan verifikasi akhir data.
+Bukti menunjukkan keberhasilan provisioning, inisialisasi penyimpanan, dan verifikasi akhir data.
+
+Objek `inventory.json` digunakan sebagai media penyimpanan data inventaris aplikasi.
+
+Setelah seluruh pengujian CRUD selesai, data pengujian dihapus dan isi objek kembali menjadi array kosong.
 
 ### 4.4 AWS Lambda Provisioning and Configuration
 
@@ -127,22 +170,28 @@ Total: 5 screenshots.
 
 Konfigurasi utama Lambda:
 
-- Function name: labinventory-crud.
-- Runtime: Python 3.11.
-- Architecture: x86_64.
-- Memory: 128 MB.
-- Timeout: 15 seconds.
-- Handler: src.lambda_function.lambda_handler.
-- Execution role: LabRole.
+| Configuration | Value |
+|---|---|
+| Function Name | labinventory-crud |
+| Runtime | Python 3.11 |
+| Architecture | x86_64 |
+| Memory | 128 MB |
+| Timeout | 15 seconds |
+| Ephemeral Storage | 512 MB |
+| Handler | src.lambda_function.lambda_handler |
+| Execution Role | LabRole |
+| Deployment Type | ZIP Package |
 
 Environment variables:
 
-- BUCKET_NAME: labinventory-534903-20261125.
-- OBJECT_KEY: inventory.json.
+| Variable | Value |
+|---|---|
+| BUCKET_NAME | labinventory-534903-20261125 |
+| OBJECT_KEY | inventory.json |
 
-Bukti menunjukkan bahwa komponen pemrosesan aplikasi
-telah berhasil dikonfigurasi dan source code telah
-berhasil di-deploy.
+Bukti menunjukkan bahwa komponen pemrosesan aplikasi telah berhasil dikonfigurasi dan source code telah berhasil di-deploy.
+
+AWS Lambda digunakan untuk menjalankan logika CRUD, validasi data, komunikasi dengan Amazon S3, serta pembentukan response aplikasi.
 
 ### 4.5 IAM and Service Permissions
 
@@ -153,14 +202,24 @@ berhasil di-deploy.
 
 Total: 2 screenshots.
 
-Lambda menggunakan execution role LabRole yang
-disediakan oleh lingkungan AWS Academy Sandbox.
+Lambda menggunakan execution role `LabRole` yang disediakan oleh lingkungan AWS Academy Sandbox.
 
-Bukti menunjukkan konfigurasi izin layanan yang
-mendukung akses penyimpanan dan pencatatan log.
+Execution role mendukung akses terhadap layanan yang diperlukan, antara lain:
 
-Implementasi tidak mengklaim penerapan custom
-least-privilege IAM policy secara penuh.
+- Membaca objek inventaris pada Amazon S3.
+- Menulis perubahan data inventaris pada Amazon S3.
+- Menghasilkan log eksekusi melalui Amazon CloudWatch.
+
+Operasi penyimpanan yang digunakan oleh aplikasi:
+
+- `s3:GetObject`
+- `s3:PutObject`
+
+Bukti menunjukkan konfigurasi izin layanan yang mendukung akses penyimpanan dan pencatatan log.
+
+Implementasi tidak mengklaim penerapan custom least-privilege IAM policy secara penuh karena menggunakan execution role yang disediakan oleh lingkungan sandbox.
+
+Penerapan IAM policy dengan izin yang lebih spesifik merupakan rekomendasi pengembangan untuk lingkungan produksi.
 
 ### 4.6 AWS Functional Testing
 
@@ -182,24 +241,51 @@ Seluruh screenshot pada kategori ini telah dikumpulkan.
 
 Pengujian dilakukan melalui Lambda Test Event.
 
-Status code merupakan response aplikasi yang
-dikembalikan oleh Lambda handler.
+Status code merupakan response aplikasi yang dikembalikan oleh Lambda handler.
 
-Status 400 dan 404 merupakan hasil yang diharapkan
-pada skenario negative testing.
+Status 400 dan 404 merupakan hasil yang diharapkan pada skenario negative testing.
 
-Data pengujian:
+#### Test Data
 
-- ID barang: BRG-DAC9867BF6AC.
-- Nama barang: Arduino Uno.
-- Kategori: Mikrokontroler.
-- Jumlah awal: 15.
-- Kondisi awal: Baik.
-- Jumlah setelah update: 12.
-- Kondisi setelah update: Rusak Ringan.
+| Attribute | Initial Value | Updated Value |
+|---|---|---|
+| id_barang | BRG-DAC9867BF6AC | BRG-DAC9867BF6AC |
+| nama_barang | Arduino Uno | Arduino Uno |
+| kategori | Mikrokontroler | Mikrokontroler |
+| jumlah | 15 | 12 |
+| kondisi | Baik | Rusak Ringan |
 
-Barang berhasil dihapus pada akhir pengujian dan
-inventaris kembali berisi array kosong.
+#### CRUD Testing Summary
+
+| Operation | Endpoint | Expected Status | Result |
+|---|---|---:|---|
+| Create | POST /barang | 201 | PASS |
+| Read | GET /barang | 200 | PASS |
+| Update | PUT /barang/{id_barang} | 200 | PASS |
+| Delete | DELETE /barang/{id_barang} | 200 | PASS |
+
+#### Negative Testing Summary
+
+| Scenario | Expected Status | Result |
+|---|---:|---|
+| Jumlah barang negatif | 400 | PASS |
+| ID barang tidak ditemukan | 404 | PASS |
+
+#### Final Data Verification
+
+Setelah seluruh pengujian selesai, barang berhasil dihapus dan inventaris kembali berisi array kosong.
+
+Response akhir:
+
+```json
+{
+    "message": "Data inventaris berhasil dibaca.",
+    "total": 0,
+    "data": []
+}
+```
+
+Hasil pengujian menunjukkan bahwa seluruh operasi CRUD dan skenario validasi yang diuji telah berjalan sesuai expected result.
 
 ### 4.7 Amazon CloudWatch Monitoring
 
@@ -212,13 +298,21 @@ Total: 2 screenshots.
 
 Log group:
 
+```text
 /aws/lambda/labinventory-crud
+```
 
-Bukti menunjukkan bahwa Lambda berhasil menghasilkan
-log eksekusi melalui Amazon CloudWatch.
+Bukti menunjukkan bahwa Lambda berhasil menghasilkan log eksekusi melalui Amazon CloudWatch.
 
-Log digunakan untuk membantu monitoring dan
-troubleshooting aplikasi.
+Informasi log digunakan untuk membantu:
+
+- Monitoring eksekusi Lambda.
+- Pemeriksaan request aplikasi.
+- Identifikasi kesalahan.
+- Troubleshooting.
+- Pemeriksaan durasi eksekusi dan penggunaan memory.
+
+CloudWatch digunakan sebagai komponen monitoring dasar dalam arsitektur LabInventory.
 
 ### 4.8 HTTP Interface and Connectivity
 
@@ -231,11 +325,16 @@ Total: 2 screenshots.
 
 Konfigurasi antarmuka:
 
-- Interface: Lambda Function URL.
-- Authentication: AWS_IAM.
-- Invoke mode: BUFFERED.
-- Protocol: HTTPS.
-- Request authentication: AWS Signature Version 4.
+| Configuration | Value |
+|---|---|
+| Interface | Lambda Function URL |
+| Authentication | AWS_IAM |
+| Invoke Mode | BUFFERED |
+| Protocol | HTTPS |
+| Request Authentication | AWS Signature Version 4 |
+| Test Client | AWS CloudShell |
+| Tested Method | GET |
+| Tested Endpoint | /barang |
 
 Hasil pengujian HTTP aktual:
 
@@ -253,11 +352,15 @@ Response body:
 }
 ```
 
-Pengujian HTTP langsung dilakukan menggunakan
-metode GET /barang.
+Pengujian menunjukkan bahwa client yang memiliki kredensial dan izin AWS yang sesuai dapat mengakses Lambda Function URL melalui request HTTPS yang ditandatangani menggunakan AWS Signature Version 4.
 
-Pengujian seluruh operasi CRUD dilakukan melalui
-Lambda Test Event.
+Pengujian HTTP langsung dilakukan menggunakan metode `GET /barang`.
+
+Pengujian seluruh operasi CRUD dilakukan melalui Lambda Test Event.
+
+Dengan demikian, pengujian konektivitas HTTP aktual dibedakan dari pengujian fungsional seluruh operasi CRUD.
+
+Function URL tidak dicantumkan secara langsung pada dokumentasi publik.
 
 ### 4.9 Amazon S3 Security Configuration
 
@@ -268,12 +371,23 @@ Lambda Test Event.
 
 Total: 2 screenshots.
 
-Bukti menunjukkan konfigurasi keamanan dasar
-penyimpanan Amazon S3.
+Konfigurasi keamanan:
 
-Bucket tidak dikonfigurasi untuk memberikan
-akses publik dan menggunakan enkripsi penyimpanan
-dengan kunci yang dikelola Amazon S3.
+| Security Configuration | Value |
+|---|---|
+| Block All Public Access | Enabled |
+| Default Encryption | Enabled |
+| Encryption Type | SSE-S3 |
+| Public Storage Access | Not Configured |
+| HTTP Interface Authentication | AWS_IAM |
+
+Bukti menunjukkan konfigurasi keamanan dasar penyimpanan Amazon S3.
+
+Bucket tidak dikonfigurasi untuk memberikan akses publik dan menggunakan enkripsi penyimpanan dengan kunci yang dikelola Amazon S3.
+
+Akses terhadap data inventaris dilakukan melalui Lambda yang menggunakan execution role sesuai lingkungan AWS Academy Sandbox.
+
+---
 
 ## 5. Evidence Summary
 
@@ -288,32 +402,92 @@ dengan kunci yang dikelola Amazon S3.
 | Amazon CloudWatch Monitoring | 2 | 2 |
 | HTTP Interface and Connectivity | 2 | 2 |
 | Amazon S3 Security Configuration | 2 | 2 |
-| Total | 29 | 29 |
+| Final Repository Evidence | 2 | 2 |
+| Final Architecture Diagram | 1 | 1 |
+| **Total** | **32** | **32** |
 
-Sebanyak 29 screenshot telah dikumpulkan untuk
-mendokumentasikan pengembangan, provisioning,
-konfigurasi, dan pengujian LabInventory.
+Sebanyak 32 screenshot telah dikumpulkan untuk mendokumentasikan pengembangan, provisioning, konfigurasi, pengujian, dan finalisasi LabInventory.
 
-Jumlah tersebut belum mencakup bukti repository
-dan dokumentasi final yang akan disiapkan setelah
-finalisasi repository selesai.
+Jumlah tersebut terdiri atas:
+
+- 29 screenshot teknis.
+- 2 screenshot dokumentasi repository.
+- 1 screenshot diagram arsitektur final.
+
+Seluruh bukti mentah disimpan secara lokal dan tidak diunggah ke repository publik.
+
+---
 
 ## 6. Additional Final Documentation Evidence
 
-Bukti tambahan berikut akan disiapkan pada tahap
-finalisasi repository dan laporan.
+Bukti tambahan telah dikumpulkan pada tahap finalisasi repository dan dokumentasi.
 
-| ID | Suggested Filename | Description | Status |
+| ID | Filename | Description | Status |
 |---|---|---|---|
-| EV-30 | final_github_repository.png | Tampilan repository GitHub final | Pending |
-| EV-31 | final_git_commit_history.png | Riwayat commit pengembangan | Pending |
-| EV-32 | final_architecture_diagram.png | Diagram arsitektur final | Pending |
+| EV-30 | final_github_repository.png | Tampilan repository GitHub final | Collected |
+| EV-31 | final_git_commit_history.png | Riwayat commit pengembangan | Collected |
+| EV-32 | final_architecture_diagram.png | Diagram arsitektur final | Collected |
 
-Ketiga bukti tersebut belum dihitung sebagai bagian
-dari 29 screenshot yang telah dikumpulkan.
+Total: 3 screenshots.
 
-Nama file merupakan usulan penamaan dan dapat
-disesuaikan pada tahap penyusunan laporan.
+### 6.1 GitHub Repository Evidence
+
+Repository:
+
+https://github.com/aurelia-mutiah/labinventory-cloud
+
+Branch:
+
+```text
+main
+```
+
+Repository berisi:
+
+- Source code aplikasi.
+- Automated tests.
+- Dokumentasi arsitektur.
+- Design brief.
+- Deployment plan.
+- Testing plan.
+- Evidence documentation.
+- Dependency configuration.
+- Git ignore configuration.
+
+Bukti repository menunjukkan bahwa source code, dokumentasi, dan konfigurasi proyek telah dikelola menggunakan Git dan GitHub.
+
+### 6.2 Git Commit History Evidence
+
+Riwayat commit:
+
+https://github.com/aurelia-mutiah/labinventory-cloud/commits/main/
+
+Riwayat commit mendokumentasikan perkembangan proyek secara bertahap, mulai dari inisialisasi repository, pengembangan aplikasi, pengujian, hingga finalisasi dokumentasi.
+
+Progressive commits digunakan untuk menunjukkan proses pengembangan dan pengelolaan perubahan proyek.
+
+### 6.3 Final Architecture Diagram Evidence
+
+Diagram arsitektur tersedia pada README utama dan dokumentasi arsitektur.
+
+Diagram telah berhasil dirender pada GitHub menggunakan Mermaid.
+
+Komponen yang ditampilkan:
+
+- Authorized Client / AWS CloudShell.
+- AWS Lambda Console Tester.
+- Lambda Function URL dengan AWS_IAM.
+- AWS Lambda Python CRUD Handler.
+- AWS IAM LabRole.
+- Amazon S3 Private Bucket.
+- Amazon CloudWatch.
+- AWS Region us-east-1.
+
+Diagram menggambarkan request flow, data flow, execution permissions, konektivitas HTTPS, dan hubungan antar layanan yang digunakan pada implementasi aktual.
+
+Ketiga screenshot dokumentasi final telah dihitung dalam total 32 screenshot pada Evidence Summary.
+
+---
 
 ## 7. Screenshot Guidelines
 
@@ -324,21 +498,19 @@ Setiap screenshot harus:
 - Menampilkan konfigurasi atau hasil aktual.
 - Menghindari pemotongan informasi penting.
 - Menggunakan penamaan file yang jelas.
-- Tidak menampilkan kredensial AWS.
-- Tidak menampilkan token atau informasi rahasia.
-- Tidak menampilkan presigned URL atau session token.
+- Tidak menampilkan kredensial AWS pada salinan yang dibagikan.
+- Tidak menampilkan token atau informasi rahasia pada salinan yang dibagikan.
+- Tidak menampilkan presigned URL atau session token pada salinan yang dibagikan.
 
-Informasi seperti account ID, ARN lengkap,
-alamat email, dan detail akun dapat disamarkan
-apabila tidak diperlukan sebagai bukti.
+Informasi seperti account ID, ARN lengkap, alamat email, dan detail akun dapat disamarkan apabila tidak diperlukan sebagai bukti.
 
 Screenshot asli disimpan secara lokal.
 
-Apabila diperlukan penyensoran, perubahan dilakukan
-pada salinan screenshot, bukan pada file asli.
+Apabila diperlukan penyensoran, perubahan dilakukan pada salinan screenshot, bukan pada file asli.
 
-Penyensoran tidak boleh mengubah hasil pengujian
-atau konfigurasi teknis yang menjadi bukti.
+Penyensoran tidak boleh mengubah hasil pengujian atau konfigurasi teknis yang menjadi bukti.
+
+---
 
 ## 8. Evidence Status Classification
 
@@ -350,22 +522,26 @@ atau konfigurasi teknis yang menjadi bukti.
 | FAIL | Hasil pengujian tidak sesuai expected result |
 | Blocked | Bukti tidak dapat dikumpulkan karena kendala |
 | Not Applicable | Bukti tidak relevan pada implementasi final |
+| In Progress | Proses dokumentasi atau finalisasi masih berlangsung |
 
-Status Collected menunjukkan bahwa file bukti
-telah tersedia.
+Status Collected menunjukkan bahwa file bukti telah tersedia.
 
-Status PASS menunjukkan bahwa hasil pengujian
-sesuai dengan expected result.
+Status PASS menunjukkan bahwa hasil pengujian sesuai dengan expected result.
 
-Ketersediaan screenshot tidak secara otomatis
-membuktikan seluruh aspek keamanan atau kualitas
-sistem telah diuji.
+Ketersediaan screenshot tidak secara otomatis membuktikan seluruh aspek keamanan atau kualitas sistem telah diuji.
+
+---
 
 ## 9. Evidence Security
 
-Folder evidence/raw telah dimasukkan ke dalam
-.gitignore agar screenshot mentah tidak ikut
-terunggah ke repository publik.
+Folder `evidence/raw/` telah dimasukkan ke dalam `.gitignore` agar screenshot mentah tidak ikut terunggah ke repository publik.
+
+Aturan pengecualian:
+
+```gitignore
+/evidence/raw/
+/evidence/private/
+```
 
 Pemeriksaan aturan Git dilakukan menggunakan:
 
@@ -387,11 +563,11 @@ git ls-files evidence/raw
 
 Hasil pemeriksaan tidak menampilkan file apa pun.
 
-Hasil tersebut menunjukkan bahwa folder evidence/raw
-tidak memiliki file yang sedang dilacak oleh Git.
+Hasil tersebut menunjukkan bahwa folder `evidence/raw/` tidak memiliki file yang sedang dilacak oleh Git.
 
-Sebelum screenshot dimasukkan ke laporan akhir,
-lakukan pemeriksaan terhadap informasi sensitif.
+Pemeriksaan ini tidak mencakup audit menyeluruh terhadap seluruh riwayat commit.
+
+Sebelum screenshot dimasukkan ke laporan akhir, lakukan pemeriksaan terhadap informasi sensitif.
 
 Informasi yang tidak boleh dibagikan meliputi:
 
@@ -403,20 +579,17 @@ Informasi yang tidak boleh dibagikan meliputi:
 - Presigned URL beserta parameter autentikasinya.
 - Informasi autentikasi lainnya.
 
-Alamat Function URL dan informasi identitas akun
-dapat disamarkan apabila tidak diperlukan untuk
-keperluan penilaian.
+Alamat Function URL dan informasi identitas akun dapat disamarkan apabila tidak diperlukan untuk keperluan penilaian.
 
-Screenshot mentah tetap disimpan secara lokal
-dan tidak diunggah ke repository publik.
+Screenshot mentah tetap disimpan secara lokal dan tidak diunggah ke repository publik.
+
+---
 
 ## 10. Evidence Selection for Final Report
 
-Tidak seluruh screenshot harus dimasukkan ke dalam
-bagian utama laporan.
+Tidak seluruh screenshot harus dimasukkan ke dalam bagian utama laporan.
 
-Pemilihan bukti dilakukan berdasarkan relevansi
-terhadap tujuan tugas Cloud Computing.
+Pemilihan bukti dilakukan berdasarkan relevansi terhadap tujuan tugas Cloud Computing.
 
 ### 10.1 Development Evidence
 
@@ -428,8 +601,7 @@ terhadap tujuan tugas Cloud Computing.
 
 - Diagram arsitektur final.
 - Konfigurasi region AWS.
-- Hubungan antara Lambda, S3, IAM, Function URL,
-  dan CloudWatch.
+- Hubungan antara Lambda, S3, IAM, Function URL, dan CloudWatch.
 
 ### 10.3 Infrastructure Evidence
 
@@ -450,7 +622,7 @@ terhadap tujuan tugas Cloud Computing.
 
 ### 10.5 Functional Testing Evidence
 
-- Initial connectivity test.
+- Initial inventory verification.
 - Create barang.
 - Read barang.
 - Update barang.
@@ -467,29 +639,28 @@ terhadap tujuan tugas Cloud Computing.
 - CloudWatch log events.
 - Isi akhir inventory.json.
 
-Bukti utama dapat ditempatkan pada bagian
-implementasi dan pengujian laporan.
+Bukti utama dapat ditempatkan pada bagian implementasi dan pengujian laporan.
 
-Screenshot tambahan dapat disertakan pada bagian
-lampiran agar laporan utama tetap terstruktur.
+Screenshot tambahan dapat disertakan pada bagian lampiran agar laporan utama tetap terstruktur.
 
-Seluruh screenshot yang dipilih perlu diperiksa
-keterbacaan dan keamanan informasinya sebelum
-laporan diselesaikan.
+Seluruh screenshot yang dipilih perlu diperiksa keterbacaan dan keamanan informasinya sebelum laporan diselesaikan.
+
+---
 
 ## 11. Relationship with Project Documentation
 
 | Document | Relationship |
 |---|---|
-| docs/architecture.md | Diagram, konfigurasi, dan keputusan arsitektur |
-| docs/design-brief.md | Gambaran sistem, tujuan, model data, dan hasil implementasi |
-| docs/deployment-plan.md | Prosedur provisioning dan deployment AWS |
-| docs/testing-plan.md | Skenario, hasil, dan referensi bukti pengujian |
-| README.md | Gambaran umum repository dan panduan penggunaan |
-| evidence/README.md | Indeks bukti pengembangan dan implementasi |
+| [Architecture Documentation](../docs/architecture.md) | Diagram, konfigurasi, dan keputusan arsitektur |
+| [Design Brief](../docs/design-brief.md) | Gambaran sistem, tujuan, model data, dan hasil implementasi |
+| [Deployment Plan](../docs/deployment-plan.md) | Prosedur provisioning dan deployment AWS |
+| [Testing Plan](../docs/testing-plan.md) | Skenario, hasil, dan referensi bukti pengujian |
+| [Project README](../README.md) | Gambaran umum repository dan panduan penggunaan |
+| [Evidence Documentation](README.md) | Indeks bukti pengembangan dan implementasi |
 
-Seluruh dokumentasi harus konsisten dengan
-konfigurasi aktual dan hasil pengujian.
+Seluruh dokumentasi harus konsisten dengan konfigurasi aktual dan hasil pengujian.
+
+---
 
 ## 12. Current Status
 
@@ -503,21 +674,46 @@ konfigurasi aktual dan hasil pengujian.
 | AWS Security Evidence | Collected |
 | CloudWatch Monitoring Evidence | Collected |
 | HTTP Connectivity Evidence | Collected |
-| Final Repository Evidence | Pending |
-| Final Architecture Diagram Evidence | Pending |
-| Final Report Evidence Selection | Pending |
+| Final Repository Evidence | Collected |
+| Final Architecture Diagram Evidence | Collected |
+| Final Report Evidence Selection | In Progress |
 
-Total technical screenshots collected: 29.
+### 12.1 Final Evidence Summary
+
+| Category | Result |
+|---|---|
+| Technical Screenshots | 29 |
+| Final Documentation Screenshots | 3 |
+| Total Screenshots | 32 |
+| Local Automated Tests | 35/35 Passed |
+| AWS Lambda Functional Tests | 9/9 Passed |
+| HTTPS Connectivity Test | HTTP 200 |
+| Final Inventory Verification | Empty Array |
+| GitHub Repository | Available |
+| Architecture Diagram | Available |
+
+### 12.2 Completion Status
 
 **Technical Evidence Status: Collected**
 
-**Final Documentation Evidence Status: In Progress**
+**Final Documentation Evidence Status: Collected**
 
-Bukti teknis utama LabInventory telah dikumpulkan
-dan mencakup pengembangan lokal, deployment AWS,
-pengujian CRUD, konektivitas HTTPS, keamanan dasar,
-persistensi data, serta monitoring.
+**Overall Evidence Collection Status: COMPLETED**
 
-Bukti repository final dan diagram arsitektur
-akan dilengkapi setelah finalisasi dokumentasi
-dan repository selesai.
+**Final Report Status: IN PROGRESS**
+
+Bukti teknis utama LabInventory telah dikumpulkan dan mencakup pengembangan lokal, deployment AWS, pengujian CRUD, konektivitas HTTPS, keamanan dasar, persistensi data, serta monitoring.
+
+Bukti repository final, riwayat commit, dan diagram arsitektur juga telah dikumpulkan.
+
+Seluruh bukti disimpan secara lokal untuk mendukung penyusunan laporan akhir tugas Cloud Computing.
+
+Pemilihan dan penyesuaian bukti pada laporan akhir masih dalam tahap finalisasi.
+
+---
+
+## Repository
+
+https://github.com/aurelia-mutiah/labinventory-cloud
+
+Developed for Cloud Computing coursework.
