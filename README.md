@@ -19,11 +19,6 @@ dan Amazon CloudWatch.
 |---|---|
 | Nama | Aurelia Mutiah Raudyatuzzahra |
 | NIM | 24/534903/TK/59310 |
-| NIU | 534903 |
-| Program Studi | S1 Teknologi Informasi |
-| Departemen | Teknik Elektro dan Teknologi Informasi |
-| Fakultas | Fakultas Teknik |
-| Universitas | Universitas Gadjah Mada |
 | Mata Kuliah | Cloud Computing |
 | Kelas | Teknologi Informasi/B |
 
